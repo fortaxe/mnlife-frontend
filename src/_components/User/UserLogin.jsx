@@ -3,35 +3,40 @@ import { useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-import { setLoginState } from "@/redux/authSlice";
+import { setUserLoginState } from "@/redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AdminLogin = () => {
+const UserLogin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const initialValues = {
-        email: '',
+        mobileNumber: '',
         password: '',
     };
 
     const validationSchema = Yup.object({
-        email: Yup.string().email('Invalid email address').required('Required'),
-        password: Yup.string().required('Required'),
+        mobileNumber: Yup.string()
+            .required('Mobile number is required'),
+            // .matches(/^[0-9]+$/, 'Must be only digits')
+            // .min(10, 'Mobile number must be at least 10 digits')
+            // .max(10, 'Mobile number must be 10 digits'),
+        password: Yup.string().required('Password is required'),
     });
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
-            const response = await axios.post('https://mnlifescience.vercel.app/api/admin/signin', values);
+            const response = await axios.post('https://mnlifescience.vercel.app/api/user/signin', values);
             const { token } = response.data;
 
             // Store the token in localStorage
             localStorage.setItem('token', token);
-            navigate('/admin/dashboard');
+            navigate('/dashboard');
+
             // Update the Redux state
-            dispatch(setLoginState({ isLoggedIn: true, token }));
+            dispatch(setUserLoginState({ isLoggedIn: true, token }));
             toast.success("Signed In Successfully!", { autoClose: 3000 });
         } catch (error) {
             console.error('Error during login:', error);
@@ -45,7 +50,7 @@ const AdminLogin = () => {
     return (
         <div className="flex justify-center items-center h-screen">
             <div className="w-full max-w-md p-8 bg-white rounded-md">
-                <h2 className="text-2xl font-bold mb-6 text-[#386D62]">Admin Login</h2>
+                <h2 className="text-2xl font-bold mb-6 text-[#386D62]">User Login</h2>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -54,14 +59,16 @@ const AdminLogin = () => {
                     {({ isSubmitting }) => (
                         <Form>
                             <div className="mb-4">
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                                <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
+                                    Mobile Number
+                                </label>
                                 <Field
-                                    type="email"
-                                    id="email"
-                                    name="email"
+                                    type="text"
+                                    id="mobileNumber"
+                                    name="mobileNumber"
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-[#F2F2F2] focus:ring-[#386D62] focus:border-[#386D62] sm:text-sm"
                                 />
-                                <ErrorMessage name="email" component="div" className="text-red-600 text-sm mt-1" />
+                                <ErrorMessage name="mobileNumber" component="div" className="text-red-600 text-sm mt-1" />
                             </div>
 
                             <div className="mb-6">
@@ -74,7 +81,7 @@ const AdminLogin = () => {
                                 />
                                 <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
                             </div>
-                           
+
                             <div className="mb-4">
                                 <ErrorMessage name="general" component="div" className="text-red-600 text-sm mb-2" />
                             </div>
@@ -95,4 +102,4 @@ const AdminLogin = () => {
     );
 };
 
-export default AdminLogin;
+export default UserLogin;

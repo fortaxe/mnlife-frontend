@@ -10,12 +10,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 
 const Navbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const handleChange = () => {
+        navigate("/admin/change-credentials")
+    }
 
     const handleLogout = () => {
         // Remove token from localStorage
@@ -24,26 +29,26 @@ const Navbar = () => {
         dispatch(logout());
         // Navigate to login page or wherever necessary
         navigate("/admin/signin");
+        toast.success("Signed out Successfully!", { autoClose: 3000 })
     };
 
     return (
         <div>
-            <nav className="bg-white border-gray-200 dark:bg-gray-900">
-                <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                    <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse w-full">
-                        <DropdownMenu>
+            <nav className="bg-white border-b-4 border-[#386D62]">
+                <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2 border-b-[#48887B]">
+                    <div className="flex items-center justify-end space-x-3 rtl:space-x-reverse w-full ">
+                        <DropdownMenu className="">
                             <DropdownMenuTrigger><img
-                                className="w-8 h-8 rounded-full"
-                                src="/docs/images/people/profile-picture-3.jpg"
+                                className="w-[55px] h-[55px] rounded-full"
+                                src="/image.png"
                                 alt="user photo"
                             /></DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuLabel>Change Credentials</DropdownMenuLabel>
+                                <DropdownMenuLabel className="cursor-pointer" onClick={handleChange}>Change Credentials</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleLogout}>Sign Out</DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>Sign Out</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
                     </div>
                 </div>
             </nav>

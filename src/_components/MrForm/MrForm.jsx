@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import Navbar from "../Admin/Navbar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const MrForm = () => {
     const [aadhaarCard, setAadhaarCard] = useState(null);
@@ -28,7 +30,7 @@ const MrForm = () => {
         joiningDate: Yup.date().required("Required"),
     });
 
-    const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+    const handleSubmit = async (values, { setSubmitting, setErrors, resetForm }) => {
         const token = localStorage.getItem("token");
         if (!token) {
             setErrors({ general: "No token found, please log in again." });
@@ -60,6 +62,13 @@ const MrForm = () => {
                 }
             );
             console.log("MR created:", response.data);
+            // Show success toast notification
+        toast.success("MR created successfully!");
+
+        // Reset the form fields after successful submission
+        resetForm();
+        setAadhaarCard(null);
+        setPanCard(null);
         } catch (error) {
             console.error("Error creating MR:", error);
             setErrors({ general: "Failed to create MR. Please try again." });
@@ -242,16 +251,17 @@ const MrForm = () => {
 
                             <button
                                 type="submit"
-                                className="w-full p-2 bg-[#386D62] text-white rounded hover:bg-[#386D62]"
+                                className="w-[169px] p-2 bg-[#386D62] text-white rounded hover:bg-[#386D62]"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Creating..." : "Create MR"}
+                                {isSubmitting ? "Adding..." : "Add MR"}
                             </button>
                         </Form>
                     )}
                 </Formik>
             </div>
         </div>
+        <ToastContainer />
         </div>
     );
 };

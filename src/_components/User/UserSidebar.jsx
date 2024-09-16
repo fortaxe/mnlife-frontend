@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
+const UserSidebar = () => {
   const [isOpen, setIsOpen] = useState(false); // State to control sidebar toggle
   const location = useLocation(); // Get the current location
 
@@ -16,7 +16,7 @@ const Sidebar = () => {
     <div className="flex">
       {/* Sidebar Toggle Button for small screens */}
       <button
-        aria-controls="default-sidebar"
+        aria-controls="user-sidebar"
         type="button"
         className="inline-flex items-center p-2 ms-3 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
         onClick={toggleSidebar}
@@ -39,7 +39,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside
-        id="default-sidebar"
+        id="user-sidebar"
         className={`fixed top-0 left-0 z-40 w-[200px] h-screen bg-white transition-transform border-r-5 border-[#CCA66B] ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
@@ -50,62 +50,26 @@ const Sidebar = () => {
           <ul className="font-medium">
             <li>
               <Link
-                to="/admin/dashboard/doctor-list"
+                to="/dashboard/add-doctor"
                 className={`flex items-center text-white p-2 ${
-                  isActiveRoute("/admin/dashboard/doctor-list")
+                  isActiveRoute("/dashboard/add-doctor")
                     ? "bg-[#386D62]"
                     : "bg-[#CCA66B] hover:bg-[#386D62]"
                 }`}
               >
-                <span className="ms-3">Doctor List</span>
+                <span className="ms-3">Add Doctor</span>
               </Link>
             </li>
             <li className="mt-3">
               <Link
-                to="/admin/dashboard/appointments"
+                to="/dashboard/edit-doctor"
                 className={`flex items-center text-white p-2 ${
-                  isActiveRoute("/admin/dashboard/appointments")
+                  isActiveRoute("/dashboard/edit-doctor")
                     ? "bg-[#386D62]"
                     : "bg-[#CCA66B] hover:bg-[#386D62]"
                 }`}
               >
-                <span className="ms-3">Appointments</span>
-              </Link>
-            </li>
-            <li className="mt-3">
-              <Link
-                to="/admin/dashboard/called-list"
-                className={`flex items-center text-white p-2 ${
-                  isActiveRoute("/admin/dashboard/called-list")
-                    ? "bg-[#386D62]"
-                    : "bg-[#CCA66B] hover:bg-[#386D62]"
-                }`}
-              >
-                <span className="ms-3">Called List</span>
-              </Link>
-            </li>
-            <li className="mt-3">
-              <Link
-                to="/admin/dashboard/mr-list"
-                className={`flex items-center text-white p-2 ${
-                  isActiveRoute("/admin/dashboard/mr-list")
-                    ? "bg-[#386D62]"
-                    : "bg-[#CCA66B] hover:bg-[#386D62]"
-                }`}
-              >
-                <span className="ms-3">MR List</span>
-              </Link>
-            </li>
-            <li className="mt-3">
-              <Link
-                to="/admin/dashboard/add-mr"
-                className={`flex items-center text-white p-2 ${
-                  isActiveRoute("/admin/dashboard/add-mr")
-                    ? "bg-[#386D62]"
-                    : "bg-[#CCA66B] hover:bg-[#386D62]"
-                }`}
-              >
-                <span className="ms-3">Add MR</span>
+                <span className="ms-3">Edit Doctor</span>
               </Link>
             </li>
           </ul>
@@ -120,4 +84,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default UserSidebar;
