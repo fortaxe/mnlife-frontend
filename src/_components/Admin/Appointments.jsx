@@ -21,9 +21,9 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import { toast } from "react-toastify";
-
+import ScheduleModal from './ScheduleModal';  // Assuming you have ScheduleModal in the same directory
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -32,6 +32,7 @@ const Appointments = () => {
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
   const [notes, setNotes] = useState("");
   const [isEditing, setIsEditing] = useState(false); // Editing mode managed by Dialog
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -109,6 +110,16 @@ const Appointments = () => {
     }
   };
 
+  const handleRescheduleClick = (scheduleCallId) => {
+    setSelectedScheduleId(scheduleCallId);  // Use selectedScheduleId state
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedScheduleId(null);  // Clear selectedScheduleId when closing modal
+    setIsModalOpen(false);
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -119,6 +130,81 @@ const Appointments = () => {
         <h2 className="font-bold text-[18px] text-[#386D62]">Today's Call Schedule</h2>
         <div className="grid grid-cols-3 gap-4">
           {todaysSchedule.map((call) => (
+            <div key={call.scheduleCallId} className="p-4 bg-[#EEEEEE] shadow rounded-lg">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  {call.dcotorName && <p>Dr. {call.dcotorName}</p>}
+                  {call.pharmacyName && <p>{call.pharmacyName}</p>}
+                </div>
+                <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
+                      {call.status === "Scheduled" ? "Update Status" : call.status}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>Call Done</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>Cancelled</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div>
+                  {call.doctorNumber && <p>{call.doctorNumber}</p>}
+                  {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
+                </div>
+                <div>
+                  <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
+                    <DialogTrigger asChild>
+                      <button
+                        className="px-4 py-2 bg-[#FFD9BD] rounded text-black"
+                        onClick={() => {
+                          setNotes(call.notes || ""); // Set current notes for editing
+                          setSelectedScheduleId(call.scheduleCallId);
+                          setIsEditing(true);
+                        }}
+                      >
+                        Update Notes
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>Edit Notes</DialogHeader>
+                      <Input
+                        type="text"
+                        value={notes}
+                        onChange={handleNotesChange}
+                        className="mb-4"
+                      />
+                      <DialogFooter>
+                        <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
+                          Save
+                        </Button>
+                        <DialogClose asChild>
+                          <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                <div>
+                  {call.time && (
+                    <p>{moment(call.time, "HH:mm").format("hh:mm A")}</p>
+                  )}
+                </div>
+                <div>
+                  <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className="px-4 py-2 text-blue-700 rounded">
+                    Reschedule Call
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Upcoming Schedule */}
+        <h2 className="font-bold text-[18px] text-[#386D62]">Upcoming Call Schedule</h2>
+        <div className="grid grid-cols-3 gap-4">
+          {upcomingSchedule.map((call) => (
             <div key={call.scheduleCallId} className="p-4 bg-[#EEEEEE] shadow rounded-lg">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -173,94 +259,34 @@ const Appointments = () => {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-
                 </div>
 
-                <div>
-                  {call.time && (
-                    <p>{moment(call.time, "HH:mm").format("hh:mm A")}</p>
+                <div >
+                  {call.time && call.date && (
+                    <div>
+                      <p>{moment(call.date).format("D MMM YYYY")} - {moment(call.time, "HH:mm").format("hh:mm A")}</p>
+                    </div>
                   )}
+
                 </div>
                 <div>
-                  <button className="px-4 py-2 text-blue-700 rounded">Reschedule Call</button>
+                  <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className="px-4 py-2 text-blue-700 rounded">
+                    Reschedule Call
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Upcoming Schedule */}
-        <h2 className="font-bold text-[18px] text-[#386D62] ">Upcoming Call Schedule</h2>
-        <div className="grid grid-cols-3 gap-4">
-          {upcomingSchedule.map((call) => (
-            <div key={call.scheduleCallId} className="p-4 bg-[#EEEEEE] shadow rounded-lg">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  {call.doctorName && <p>Doctor: {call.doctorName}</p>}
-                  {call.pharmacyName && <p>Pharmacy: {call.pharmacyName}</p>}
-                </div>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                      {call.status === "Scheduled" ? "Update Status" : call.status}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>Call Done</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>Cancelled</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <div>
-                  {call.doctorNumber && <p>Doctor No: {call.doctorNumber}</p>}
-                  {call.pharmacyNumber && <p>Pharmacy No: {call.pharmacyNumber}</p>}
-                </div>
-                <div>
-                  <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
-                    <DialogTrigger asChild>
-                      <button
-                        className="px-4 py-2 bg-[#FFD9BD] rounded text-black"
-                        onClick={() => {
-                          setNotes(call.notes || ""); // Set current notes for editing
-                          setSelectedScheduleId(call.scheduleCallId);
-                          setIsEditing(true);
-                        }}
-                      >
-                        Update Notes
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>Edit Notes</DialogHeader>
-                      <Input
-                        type="text"
-                        value={notes}
-                        onChange={handleNotesChange}
-                        className="mb-4"
-                      />
-                      <DialogFooter>
-                        <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
-                          Save
-                        </Button>
-                        <DialogClose asChild>
-                          <Button variant="secondary">Cancel</Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <div>
-                  {call.date && (
-                    <p>{moment(call.date).format("DD MMM, YYYY")}</p>
-                  )}
-                </div>
-                <div>
-                  <button className="px-4 py-2 text-blue-700 rounded">Reschedule Call</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Modal for Rescheduling */}
+        {isModalOpen && (
+          <ScheduleModal
+            selectedType={"doctor"} // Or fetch the type dynamically
+            scheduleCallId={selectedScheduleId}  // Use selectedScheduleId here
+            onClose={handleCloseModal}
+          />
+        )}
       </div>
     </div>
   );
