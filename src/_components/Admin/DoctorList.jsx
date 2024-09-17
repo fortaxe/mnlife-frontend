@@ -64,7 +64,6 @@ const DoctorList = () => {
                         <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
                         <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Remarks</th>
                         <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Notes</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">WhatsApp Contacted</th>
                     </tr>
                 </thead>
 

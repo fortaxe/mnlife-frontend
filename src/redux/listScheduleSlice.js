@@ -17,9 +17,22 @@ const listScheduleSlice = createSlice({
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
-    }
+    },
+    updateScheduleStatus: (state, action) => {
+      const { scheduleCallId, updateStatus } = action.payload;
+
+      // Update status in today's schedule
+      state.todaysSchedule = state.todaysSchedule.map((schedule) =>
+        schedule._id === scheduleCallId ? { ...schedule, updateStatus } : schedule
+      );
+
+      // Update status in upcoming schedule
+      state.upcomingSchedule = state.upcomingSchedule.map((schedule) =>
+        schedule._id === scheduleCallId ? { ...schedule, updateStatus } : schedule
+      );
+    },
   },
 });
 
-export const { setSchedules, setLoading } = listScheduleSlice.actions;
+export const { setSchedules, setLoading, updateScheduleStatus  } = listScheduleSlice.actions;
 export default listScheduleSlice.reducer;
