@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Navbar from "./Navbar";
+import moment from "moment";
 
 const CalledList = () => {
   const [completedCalls, setCompletedCalls] = useState([]);
@@ -26,12 +28,15 @@ const CalledList = () => {
   }, []);
 
   return (
-    <div className="overflow-x-auto">
+    <div>
+      <Navbar />
+    
+    <div className="overflow-x-auto mt-3">
       <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
         <thead className="text-left">
           <tr>
             <th className="p-2 font-medium text-gray-900">Last Called Date</th>
-            <th className="p-2 font-medium text-gray-900">Doctor Info</th>
+            <th className="p-2 font-medium text-gray-900">Doctor Name</th>
             <th className="p-2 font-medium text-gray-900">Pharmacy Name</th>
             <th className="p-2 font-medium text-gray-900">Pharmacy Number</th>
           </tr>
@@ -40,7 +45,7 @@ const CalledList = () => {
         <tbody className="divide-y divide-gray-200">
           {completedCalls.map((call, index) => (
             <tr key={index} className="odd:bg-gray-50">
-              <td className="p-2 text-gray-700">{call.lastCallDate}</td>
+              <td className="p-2 text-gray-700">{moment(call.lastCalledDate).format('D MMM YYYY')}</td>
               <td className="p-2 text-gray-700">
                 <div className="grid grid-cols-2 gap-4">
                   <span>{call.doctorName || "-"}</span>
@@ -53,6 +58,7 @@ const CalledList = () => {
           ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 };

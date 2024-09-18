@@ -1,46 +1,41 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import moment from "moment"; 
-import { Edit, Archive } from "lucide-react"; 
-import { toast } from "react-toastify"; 
-import ScheduleModal from "./ScheduleModal"; // Import the ScheduleModal component
+import moment from "moment";
+import { Edit, ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
+import ScheduleModal from "./ScheduleModal";
+import MapPopup from "../Mapbox/MapboxMap";
+import { Input } from "@/components/ui/input";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import EditClinicModal from "./EditClinicModal";
+import AdminNavbar from "./AdminNavbar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchClinics } from "@/redux/doctorList";
 
 const DoctorList = () => {
-    const [clinics, setClinics] = useState([]);
-    const [editingNote, setEditingNote] = useState({}); // To track which note is being edited
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedClinic, setSelectedClinic] = useState(null);
     const [scheduleType, setScheduleType] = useState('');
+    const [isMapPopupOpen, setIsMapPopupOpen] = useState(false);
+    const [mapCoordinates, setMapCoordinates] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    // Fetch the clinics from the API when the component loads
+    const dispatch = useDispatch();
+    const { clinics, status, error } = useSelector((state) => state.doctorList);
+  
     useEffect(() => {
-        const fetchClinics = async () => {
-            try {
-                const token = localStorage.getItem("token");
-
-                if (token) {
-                    const response = await axios.get("https://mnlifescience.vercel.app/api/getClinics", {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    setClinics(response.data); // Assuming the clinics are returned in response.data
-                    console.log(response.data);
-                } else {
-                    console.error("No token found in localStorage");
-                }
-            } catch (error) {
-                console.error("Error fetching clinics:", error);
-            }
-        };
-
-        fetchClinics();
-    }, []);
-
-    const handleNoteChange = (index, value) => {
-        setEditingNote(prevState => ({ ...prevState, [index]: value }));
-    };
+      // Dispatch the fetchClinics action when the component loads
+      dispatch(fetchClinics());
+    }, [dispatch]);
+  
+    if (status === "loading") {
+      return <div>Loading...</div>;
+    }
 
     const openScheduleModal = (clinic, type) => {
         setSelectedClinic(clinic);
@@ -48,7 +43,25 @@ const DoctorList = () => {
         setIsModalOpen(true);
     };
 
+    const handleLocationClick = (coordinates) => {
+        setMapCoordinates(coordinates);
+        setIsMapPopupOpen(true);
+    };
+
+    const handleEditClick = (clinic) => {
+        setSelectedClinic(clinic);
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdateClinic = () => {
+        fetchClinics(); // Refresh the entire list
+        toast.success("Clinic updated successfully");
+    };
+
     return (
+        <div>
+        <AdminNavbar />
+        
         <div className="overflow-x-auto">
             <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                 <thead className="ltr:text-left rtl:text-right">
@@ -71,18 +84,18 @@ const DoctorList = () => {
                     {clinics.map((clinic, index) => (
                         <tr className="odd:bg-gray-50" key={index} style={{ height: "80px" }}>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                <Edit className="w-5 h-5 text-gray-700" />
+                                <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
                             </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                 {moment(clinic.createdAt).format('D MMM YYYY')}
-                                <button className="block p-1 px-4 rounded-md mt-2 text-sm  bg-[#FFD9BD]">
+                                <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]">
                                     Archive
                                 </button>
                             </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                                 {clinic.doctorName}
                                 <button
-                                    className="block p-1 px-4 rounded-md mt-2 text-sm  bg-[#E2FFBD]"
+                                    className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                     onClick={() => openScheduleModal(clinic, 'doctor')}
                                 >
                                     Schedule Call
@@ -90,12 +103,23 @@ const DoctorList = () => {
                             </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                 {clinic.doctorNumber}
-                                <input type="checkbox" className="block mt-2" />
+                                <div className="flex items-center mt-2">
+                                    <input
+                                        type="checkbox"
+                                        id={`doctor-contacted-${clinic._id}`}
+                                        checked={clinic.doctorWhatsAppContacted}
+                                        readOnly
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor={`doctor-contacted-${clinic._id}`} className="text-sm">
+                                        What's App Contacted
+                                    </label>
+                                </div>
                             </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                 {clinic.pharmacyName}
                                 <button
-                                    className="block p-1 px-4 rounded-md mt-2 text-sm  bg-[#E2FFBD]"
+                                    className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                     onClick={() => openScheduleModal(clinic, 'pharmacy')}
                                 >
                                     Schedule Call
@@ -103,22 +127,38 @@ const DoctorList = () => {
                             </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                 {clinic.pharmacyNumber}
-                                <input type="checkbox" className="block mt-2" />
+                                <div className="flex items-center mt-2">
+                                    <input
+                                        type="checkbox"
+                                        id={`pharmacy-contacted-${clinic._id}`}
+                                        checked={clinic.pharmacyWhatsAppContacted}
+                                        readOnly
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor={`pharmacy-contacted-${clinic._id}`} className="text-sm">
+                                        Pharmacy Contacted
+                                    </label>
+                                </div>
                             </td>
-                            <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => console.log(`Clicked on location: ${clinic.location.coordinates}`)}>
+                            <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => handleLocationClick(clinic.location.coordinates)}>
                                 Location
                             </td>
-                            <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.grade}</td>
+                            <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className="flex items-center">
+                                        {clinic.grade}
+                                        <ChevronDown className="ml-2" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem>A</DropdownMenuItem>
+                                        <DropdownMenuItem>B</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.createdBy.name}</td>
                             <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks}</td>
                             <td className="whitespace-nowrap px-4 py-2">
-                                <input
-                                    type="text"
-                                    className="w-[250px] h-[66px] p-2 border border-gray-300"
-                                    value={editingNote[index] || clinic.notes}
-                                    onChange={(e) => handleNoteChange(index, e.target.value)}
-                                />
-                                {editingNote[index] && <Edit className="w-5 h-5 text-gray-700" />}
+                                <Input className="w-[300px] h-[50px]" value={clinic.notes} readOnly />
                             </td>
                         </tr>
                     ))}
@@ -132,6 +172,22 @@ const DoctorList = () => {
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
+
+            {isMapPopupOpen && (
+                <MapPopup
+                    coordinates={mapCoordinates}
+                    onClose={() => setIsMapPopupOpen(false)}
+                />
+            )}
+
+            {isEditModalOpen && (
+                <EditClinicModal
+                    clinic={selectedClinic}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onUpdate={handleUpdateClinic}
+                />
+            )}
+        </div>
         </div>
     );
 };

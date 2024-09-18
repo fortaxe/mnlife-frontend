@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const AddDoctorForm = () => {
-
+    const [location, setLocation] = useState({ lat: '', lon: '' });
     const initialValues = {
         doctorName: "",
         doctorNumber: "",
@@ -37,10 +37,17 @@ const AddDoctorForm = () => {
         }
     
         try {
+            const data = {
+                ...values,
+                location: {
+                    type: 'Point',
+                    coordinates: [location.lon, location.lat]
+                }
+            };
             // Directly send values as JSON
             const response = await axios.post(
                 "https://mnlifescience.vercel.app/api/createClinic",
-                values, // send values directly
+                data, // send values directly
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -60,6 +67,24 @@ const AddDoctorForm = () => {
             setSubmitting(false);
         }
     };
+
+    const getCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setLocation({
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                }
+            );
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+        }
+    };
     
     return (
         <div>
@@ -68,6 +93,13 @@ const AddDoctorForm = () => {
             <div className="flex h-screen">
                 <div className="w-[900px] p-8 bg-white rounded-md">
                     <h2 className="text-2xl font-bold mb-6 text-[#386D62]">Add New Doctor</h2>
+                    <button
+                        type="button"
+                        onClick={getCurrentLocation}
+                        className="p-2 bg-[#386D62] text-white rounded mb-4"
+                    >
+                        Get Current Location
+                    </button>
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
@@ -180,6 +212,8 @@ const AddDoctorForm = () => {
                                             type="text"
                                             className="w-full p-2 rounded bg-[#F2F2F2] border border-gray-300"
                                             style={{ width: "366px" }}
+                                            value={`Latitude: ${location.lat}, Longitude: ${location.lon}`}
+                                            disabled
                                         />
                                         <ErrorMessage
                                             name="location"
@@ -226,7 +260,7 @@ const AddDoctorForm = () => {
                     </Formik>
                 </div>
             </div>
-            <ToastContainer />
+            
         </div>
     );
 };

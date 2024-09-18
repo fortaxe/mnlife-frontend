@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import moment from "moment"; // For formatting dates
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"; // Import Popover from ShadCN
+import moment from "moment";
+import { Dialog, Transition } from '@headlessui/react';
+import { Download } from 'lucide-react';
 import Navbar from "./Navbar";
+import { toast } from "react-toastify";
 
 const MrList = () => {
     const [mrs, setMrs] = useState([]);
+    const [selectedDoc, setSelectedDoc] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
 
-    // Fetch the MRs from the API when the component loads
     useEffect(() => {
         const fetchMrs = async () => {
             try {
                 const token = localStorage.getItem("token");
-
                 if (token) {
                     const response = await axios.get("https://mnlifescience.vercel.app/api/getMrs", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     });
-
-                    setMrs(response.data); // Assuming the MRs are returned in response.data
-                    console.log(response.data);
+                    setMrs(response.data);
                 } else {
                     console.error("No token found in localStorage");
                 }
@@ -33,66 +33,123 @@ const MrList = () => {
         fetchMrs();
     }, []);
 
+    const openModal = (doc) => {
+        setSelectedDoc(doc);
+        setIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const handleDownload = async (url, filename) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success("File downloaded successfully", { autoClose: 3000 });
+        } catch (error) {
+            toast.error("Error downloading file, Please try Again", { autoClose: 3000 });
+        }
+    };
+
     return (
         <div>
             <Navbar />
-        <div className="overflow-x-auto mt-2">
-            <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
-                <thead className="ltr:text-left rtl:text-right">
-                    <tr>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Name</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Mobile Number</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Area Name</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Joining Date</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Aadhaar Card</th>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">PAN Card</th>
-                    </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-200">
-                    {mrs.map((mr, index) => (
-                        <tr className="odd:bg-gray-50" key={index}>
-                            <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{mr.name}</td>
-                            <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.mobileNumber}</td>
-                            <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.areaName}</td>
-                            <td className="whitespace-nowrap px-4 py-2 text-gray-700">{moment(mr.joiningDate).format('D MMM YYYY')}</td>
-                            
-                            {/* Aadhaar Card Popover */}
-                            <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                {mr.aadhaarCard ? (
-                                    <Popover>
-                                        <PopoverTrigger>
-                                            <span className="text-blue-500 cursor-pointer">View Aadhaar</span>
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <img src={mr.aadhaarCard} alt="Aadhaar Card" className="w-full h-auto" />
-                                        </PopoverContent>
-                                    </Popover>
-                                ) : (
-                                    "Not Provided"
-                                )}
-                            </td>
-
-                            {/* PAN Card Popover */}
-                            <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                {mr.panCard ? (
-                                    <Popover>
-                                        <PopoverTrigger>
-                                            <span className="text-blue-500 cursor-pointer">View PAN</span>
-                                        </PopoverTrigger>
-                                        <PopoverContent>
-                                            <img src={mr.panCard} alt="PAN Card" className="w-full h-auto" />
-                                        </PopoverContent>
-                                    </Popover>
-                                ) : (
-                                    "Not Provided"
-                                )}
-                            </td>
+            <div className="overflow-x-auto mt-2">
+                <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+                    <thead className="text-left">
+                        <tr>
+                            <th className="p-2 font-medium text-gray-900">MR Create Date</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Number</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Area</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Aadhaar Card</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pan Card</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                        {mrs.map((mr, index) => (
+                            <tr className="odd:bg-gray-50" key={index}>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{moment(mr.joiningDate).format('D MMM YYYY')}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.name}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.mobileNumber}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.areaName}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr.aadhaarCard })}>
+                                    View Aadhaar
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'PAN', url: mr.panCard })}>
+                                    View PAN
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <Transition appear show={isOpen} as={React.Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                    <Transition.Child
+                        as={React.Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={React.Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title
+                                        as="h3"
+                                        className="text-lg font-medium leading-6 text-gray-900 flex justify-between items-center"
+                                    >
+                                        {selectedDoc?.type} Card
+                                        <button
+                                            onClick={() => handleDownload(selectedDoc?.url, `${selectedDoc?.type.toLowerCase()}_card.jpg`)}
+                                            className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        >
+                                            <Download className="w-4 h-4 mr-2" />
+                                            Download
+                                        </button>
+                                    </Dialog.Title>
+                                    <div className="mt-2">
+                                        <img src={selectedDoc?.url} alt={`${selectedDoc?.type} Card`} className="w-full h-auto" />
+                                    </div>
+                                    <div className="mt-4">
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={closeModal}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
         </div>
     );
 };

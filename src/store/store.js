@@ -5,6 +5,7 @@ import authReducer from "../redux/authSlice";
 import userReduer from "../redux/userSlice";
 import scheduleReducer from "../redux/scheduleSlice";
 import listScheduleSlice from "../redux/listScheduleSlice";
+import doctorListSlice from "@/redux/doctorList";
 
 const store = configureStore({
   reducer: {
@@ -12,7 +13,8 @@ const store = configureStore({
     auth: authReducer,
     user: userReduer,
     schedule: scheduleReducer,
-    listSchedule: listScheduleSlice
+    listSchedule: listScheduleSlice,
+    doctorList: doctorListSlice
   },
 });
 
