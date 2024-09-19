@@ -3,6 +3,7 @@ import axios from "axios";
 import Navbar from "./Navbar";
 import moment from "moment";
 
+
 const CalledList = () => {
   const [completedCalls, setCompletedCalls] = useState([]);
 
@@ -19,6 +20,7 @@ const CalledList = () => {
           }
         );
         setCompletedCalls(response.data.completedCalls);
+        console.log(completedCalls)
       } catch (error) {
         console.error("Error fetching completed schedule calls:", error);
       }
@@ -30,35 +32,33 @@ const CalledList = () => {
   return (
     <div>
       <Navbar />
-    
-    <div className="overflow-x-auto mt-3">
-      <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
-        <thead className="text-left">
-          <tr>
-            <th className="p-2 font-medium text-gray-900">Last Called Date</th>
-            <th className="p-2 font-medium text-gray-900">Doctor Name</th>
-            <th className="p-2 font-medium text-gray-900">Pharmacy Name</th>
-            <th className="p-2 font-medium text-gray-900">Pharmacy Number</th>
-          </tr>
-        </thead>
 
-        <tbody className="divide-y divide-gray-200">
-          {completedCalls.map((call, index) => (
-            <tr key={index} className="odd:bg-gray-50">
-              <td className="p-2 text-gray-700">{moment(call.lastCalledDate).format('D MMM YYYY')}</td>
-              <td className="p-2 text-gray-700">
-                <div className="grid grid-cols-2 gap-4">
-                  <span>{call.doctorName || "-"}</span>
-                  <span>{call.doctorNumber || "-"}</span>
-                </div>
-              </td>
-              <td className="p-2 text-gray-700">{call.pharmacyName || "-"}</td>
-              <td className="p-2 text-gray-700">{call.pharmacyNumber || "-"}</td>
+      <div className="overflow-x-auto mt-3">
+        <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
+          <thead className="text-left">
+            <tr>
+              <th className="p-2 font-medium text-gray-900">Last Called Date</th>
+              <th className="p-2 font-medium text-gray-900">Doctor Name</th>
+              <th className="p-2 font-medium text-gray-900">Doctor Number</th>
+              <th className="p-2 font-medium text-gray-900">Pharmacy Name</th>
+              <th className="p-2 font-medium text-gray-900">Pharmacy Number</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+
+          <tbody className="divide-y divide-gray-200">
+            {completedCalls.map((call, index) => (
+              <tr key={index} className="odd:bg-gray-50">
+                <td className="p-2 text-gray-700">{moment(call.lastCalledDate).format('D MMM YYYY')}</td>
+                <td className="p-2 text-gray-700">{call.clinic.doctorName}</td>
+                <td className="p-2 text-gray-700">{call.clinic.doctorNumber}</td>
+                <td className="p-2 text-gray-700">{call.clinic.pharmacyName}</td>
+                <td className="p-2 text-gray-700">{call.clinic.pharmacyNumber}</td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+      </div>
     </div>
   );
 };

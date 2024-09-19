@@ -5,11 +5,22 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Download } from 'lucide-react';
 import Navbar from "./Navbar";
 import { toast } from "react-toastify";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 const MrList = () => {
     const [mrs, setMrs] = useState([]);
     const [selectedDoc, setSelectedDoc] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);  // For Aadhaar/PAN dialog
+    const [isPasswordOpen, setIsPasswordOpen] = useState(false); // For password dialog
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [currentMrId, setCurrentMrId] = useState(null);  // Keep track of MR ID for password change
 
     useEffect(() => {
         const fetchMrs = async () => {
@@ -42,6 +53,17 @@ const MrList = () => {
         setIsOpen(false);
     };
 
+    const openPasswordModal = (mrId) => {
+        setCurrentMrId(mrId);
+        setIsPasswordOpen(true);
+    };
+
+    const closePasswordModal = () => {
+        setIsPasswordOpen(false);
+        setNewPassword('');
+        setConfirmPassword('');
+    };
+
     const handleDownload = async (url, filename) => {
         try {
             const response = await fetch(url);
@@ -59,6 +81,61 @@ const MrList = () => {
         }
     };
 
+    const handleUpdatePassword = async () => {
+        if (newPassword === confirmPassword) {
+            try {
+                const token = localStorage.getItem("token");
+    
+                // Prepare only necessary data for the request
+                const data = {
+                    id: currentMrId,
+                    newPassword,
+                    confirmPassword,
+                };
+    
+                // Make the API request
+                const response = await axios.post(
+                    "https://mnlifescience.vercel.app/api/editMr",
+                    data,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+    
+                // Handle response
+                if (response.status === 200) {
+                    toast.success('Password updated successfully');
+                    closePasswordModal();
+                } else {
+                    toast.error('Error updating password');
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                toast.error('Failed to update password');
+            }
+        } else {
+            toast.error('Passwords do not match!');
+        }
+    };
+    
+    
+    
+    const handleUpdateStatus = async (id, status) => {
+        try {
+            const token = localStorage.getItem("token");
+            await axios.patch(
+                `https://mnlifescience.vercel.app/api/admin/edit-mr`,
+                { id, status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Status updated successfully");
+        } catch (error) {
+            toast.error(`Error updating status: ${error.response.data}`);
+        }
+    };
+
     return (
         <div>
             <Navbar />
@@ -70,6 +147,8 @@ const MrList = () => {
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Number</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Area</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Update Password</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Update Status</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Aadhaar Card</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pan Card</th>
                         </tr>
@@ -81,6 +160,23 @@ const MrList = () => {
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.name}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.mobileNumber}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.areaName}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <button
+                                        onClick={() => openPasswordModal(mr._id)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        Update Password
+                                    </button>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>{mr.status}</DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'Active')}>Active</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'In-Active')}>In-active</DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr.aadhaarCard })}>
                                     View Aadhaar
                                 </td>
@@ -93,6 +189,7 @@ const MrList = () => {
                 </table>
             </div>
 
+            {/* Aadhaar/PAN Modal */}
             <Transition appear show={isOpen} as={React.Fragment}>
                 <Dialog as="div" className="relative z-10" onClose={closeModal}>
                     <Transition.Child
@@ -119,29 +216,77 @@ const MrList = () => {
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                    <Dialog.Title
-                                        as="h3"
-                                        className="text-lg font-medium leading-6 text-gray-900 flex justify-between items-center"
-                                    >
+                                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 flex justify-between items-center">
                                         {selectedDoc?.type} Card
                                         <button
                                             onClick={() => handleDownload(selectedDoc?.url, `${selectedDoc?.type.toLowerCase()}_card.jpg`)}
                                             className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
-                                            <Download className="w-4 h-4 mr-2" />
-                                            Download
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Download {selectedDoc?.type}
                                         </button>
                                     </Dialog.Title>
-                                    <div className="mt-2">
+                                    <div className="mt-4">
                                         <img src={selectedDoc?.url} alt={`${selectedDoc?.type} Card`} className="w-full h-auto" />
                                     </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+
+            {/* Update Password Modal */}
+            <Transition appear show={isPasswordOpen} as={React.Fragment}>
+                <Dialog as="div" className="relative z-10" onClose={closePasswordModal}>
+                    <Transition.Child
+                        as={React.Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={React.Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                                        Update Password
+                                    </Dialog.Title>
                                     <div className="mt-4">
+                                        <Input
+                                            type="password"
+                                            placeholder="New Password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="mb-2"
+                                        />
+                                        <Input
+                                            type="password"
+                                            placeholder="Confirm Password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="mt-6 flex justify-end">
                                         <button
-                                            type="button"
-                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                            onClick={closeModal}
+                                            onClick={handleUpdatePassword}
+                                            className="ml-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
-                                            Close
+                                            Update Password
                                         </button>
                                     </div>
                                 </Dialog.Panel>
