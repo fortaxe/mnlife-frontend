@@ -67,8 +67,12 @@ const ScheduleModal = ({ selectedClinic, selectedType, scheduleCallId, onClose }
             toast.success(`Schedule ${scheduleCallId ? "rescheduled" : "created"} successfully!`);
             onClose();
         } catch (error) {
-            console.log("Error scheduling call:", error);
-            toast.error("Error scheduling call. Try again later.");
+            if (error.response && error.response.status === 400) {
+                toast.error("A schedule call already exists for this date and time.");
+            } else {
+                console.log("Error scheduling call:", error);
+                toast.error("Error scheduling call. Try again later.");
+            }
         }
     };
     

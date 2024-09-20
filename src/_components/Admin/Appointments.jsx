@@ -23,7 +23,8 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { toast } from "react-toastify";
-import ScheduleModal from './ScheduleModal';  // Assuming you have ScheduleModal in the same directory
+import ScheduleModal from './ScheduleModal';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -35,34 +36,35 @@ const Appointments = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        dispatch(setLoading(true));
-
-        const headers = {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        };
-
-        const [todayResponse, upcomingResponse] = await Promise.all([
-          axios.get('https://mnlifescience.vercel.app/api/schedule/today', { headers }),
-          axios.get('https://mnlifescience.vercel.app/api/schedule/upcoming', { headers }),
-        ]);
-
-        dispatch(setSchedules({
-          todaysSchedule: todayResponse.data.scheduleCalls,
-          upcomingSchedule: upcomingResponse.data.scheduleCalls,
-        }));
-      } catch (error) {
-        console.error('Failed to load schedules', error);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
     fetchSchedules();
   }, [dispatch]);
+
+
+  const fetchSchedules = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      dispatch(setLoading(true));
+
+      const headers = {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      };
+
+      const [todayResponse, upcomingResponse] = await Promise.all([
+        axios.get('https://mnlifescience.vercel.app/api/schedule/today', { headers }),
+        axios.get('https://mnlifescience.vercel.app/api/schedule/upcoming', { headers }),
+      ]);
+
+      dispatch(setSchedules({
+        todaysSchedule: todayResponse.data.scheduleCalls,
+        upcomingSchedule: upcomingResponse.data.scheduleCalls,
+      }));
+    } catch (error) {
+      console.error('Failed to load schedules', error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
   const handleStatusUpdate = async (scheduleCallId, newStatus) => {
     try {
@@ -79,12 +81,25 @@ const Appointments = () => {
       );
 
       dispatch(updateScheduleStatus({ scheduleCallId, updateStatus: newStatus }));
-      setStatus(newStatus);
+      // Update local state to reflect the change immediately
+      const updateScheduleList = (list) =>
+        list.map(call =>
+          call.scheduleCallId === scheduleCallId
+            ? { ...call, status: newStatus }
+            : call
+        );
+
+      dispatch(setSchedules({
+        todaysSchedule: updateScheduleList(todaysSchedule),
+        upcomingSchedule: updateScheduleList(upcomingSchedule),
+      }));
+
+      toast.success(`Status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating status:", error);
+      toast.error("Failed to update status");
     }
   };
-
   const handleNotesChange = (event) => {
     setNotes(event.target.value);
   };
@@ -118,6 +133,7 @@ const Appointments = () => {
   const handleCloseModal = () => {
     setSelectedScheduleId(null);  // Clear selectedScheduleId when closing modal
     setIsModalOpen(false);
+    fetchSchedules();
   };
 
   if (loading) return <div>Loading...</div>;
@@ -125,77 +141,75 @@ const Appointments = () => {
   return (
     <div>
       <Navbar />
-      <div className="space-y-4 mt-5">
+      <div className="space-x-4 space-y-4 mt-20 pr-4">
         {/* Today's Schedule */}
-        <h2 className="font-bold text-[18px] text-[#386D62]">Today's Call Schedule</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <h2 className="font-bold text-[18px] ml-4 text-[#386D62]">Today's Call Schedule</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {todaysSchedule.map((call) => (
-            <div key={call.scheduleCallId} className="p-4 bg-[#EEEEEE] shadow rounded-lg">
-              <div className="grid grid-cols-2 gap-4">
+            <div key={call.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   {call.dcotorName && <p>Dr. {call.dcotorName}</p>}
                   {call.pharmacyName && <p>{call.pharmacyName}</p>}
                 </div>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                      {call.status === "Scheduled" ? "Update Status" : call.status}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>Call Done</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>Cancelled</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
+                    {call.status === "Scheduled" ? "Update Status" : call.status}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
+                      Call Done
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>
+                      Cancelled
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   {call.doctorNumber && <p>{call.doctorNumber}</p>}
                   {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
                 </div>
-                <div>
-                  <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
-                    <DialogTrigger asChild>
-                      <button
-                        className="px-4 py-2 bg-[#FFD9BD] rounded text-black"
-                        onClick={() => {
-                          setNotes(call.notes || ""); // Set current notes for editing
-                          setSelectedScheduleId(call.scheduleCallId);
-                          setIsEditing(true);
-                        }}
-                      >
-                        Update Notes
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>Edit Notes</DialogHeader>
-                      <Input
-                        type="text"
-                        value={notes}
-                        onChange={handleNotesChange}
-                        className="mb-4"
-                      />
-                      <DialogFooter>
-                        <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
-                          Save
-                        </Button>
-                        <DialogClose asChild>
-                          <Button variant="secondary">Cancel</Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="px-4 py-2 bg-[#FFD9BD] rounded text-black hover:bg-[#FFD9BD]"
+                      onClick={() => {
+                        setNotes(call.notes || "");
+                        setSelectedScheduleId(call.scheduleCallId);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Update Notes
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>Edit Notes</DialogHeader>
+                    <Input
+                      type="text"
+                      value={notes}
+                      onChange={handleNotesChange}
+                      className="mb-4"
+                    />
+                    <DialogFooter>
+                      <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
+                        Save
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant="secondary">Cancel</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
 
-                <div>
-                  {call.time && (
-                    <p>{moment(call.time, "HH:mm").format("hh:mm A")}</p>
-                  )}
-                </div>
-                <div>
-                  <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className="px-4 py-2 text-blue-700 rounded">
-                    Reschedule Call
-                  </button>
-                </div>
+              <div className="flex justify-between items-center">
+                <div>{call.time && <p>{moment(call.time, "HH:mm").format("hh:mm A")}</p>}</div>
+                <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
+                  Reschedule Call
+                </button>
               </div>
             </div>
           ))}
@@ -203,77 +217,79 @@ const Appointments = () => {
 
         {/* Upcoming Schedule */}
         <h2 className="font-bold text-[18px] text-[#386D62]">Upcoming Call Schedule</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {upcomingSchedule.map((call) => (
-            <div key={call.scheduleCallId} className="p-4 bg-[#EEEEEE] shadow rounded-lg">
-              <div className="grid grid-cols-2 gap-4">
+            <div key={call.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   {call.doctorName && <p>Dr. {call.doctorName}</p>}
                   {call.pharmacyName && <p>{call.pharmacyName}</p>}
                 </div>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                      {call.status === "Scheduled" ? "Update Status" : call.status}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>Call Done</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>Cancelled</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
+                    {call.status === "Scheduled" ? "Update Status" : call.status}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
+                      Call Done
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>
+                      Cancelled
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
+              <div className="flex justify-between items-center mb-4">
                 <div>
                   {call.doctorNumber && <p>{call.doctorNumber}</p>}
                   {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
                 </div>
-                <div>
-                  <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
-                    <DialogTrigger asChild>
-                      <button
-                        className="px-4 py-2 bg-[#FFD9BD] rounded text-black"
-                        onClick={() => {
-                          setNotes(call.notes || ""); // Set current notes for editing
-                          setSelectedScheduleId(call.scheduleCallId);
-                          setIsEditing(true);
-                        }}
-                      >
-                        Update Notes
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>Edit Notes</DialogHeader>
-                      <Input
-                        type="text"
-                        value={notes}
-                        onChange={handleNotesChange}
-                        className="mb-4"
-                      />
-                      <DialogFooter>
-                        <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
-                          Save
-                        </Button>
-                        <DialogClose asChild>
-                          <Button variant="secondary">Cancel</Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                
+                <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="px-4 py-2 bg-[#FFD9BD] rounded text-black hover:bg-[#FFD9BD]"
+                      onClick={() => {
+                        setNotes(call.notes || "");
+                        setSelectedScheduleId(call.scheduleCallId);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Update Notes
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>Edit Notes</DialogHeader>
+                    <Input
+                      type="text"
+                      value={notes}
+                      onChange={handleNotesChange}
+                      className="mb-4"
+                    />
+                    <DialogFooter>
+                      <Button onClick={() => handleSaveNotes(selectedScheduleId)} className="mr-2">
+                        Save
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant="secondary">Cancel</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
 
-                <div >
+              <div className="flex justify-between items-center">
+                <div>
                   {call.time && call.date && (
-                    <div>
-                      <p>{moment(call.date).format("D MMM YYYY")} - {moment(call.time, "HH:mm").format("hh:mm A")}</p>
-                    </div>
+                    <p>
+                      {moment(call.date).format("D MMM YYYY")} - {moment(call.time, "HH:mm").format("hh:mm A")}
+                    </p>
                   )}
-
                 </div>
-                <div>
-                  <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className="px-4 py-2 text-blue-700 rounded">
-                    Reschedule Call
-                  </button>
-                </div>
+                <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
+                  Reschedule Call
+                </button>
               </div>
             </div>
           ))}
@@ -283,7 +299,7 @@ const Appointments = () => {
         {isModalOpen && (
           <ScheduleModal
             selectedType={"doctor"} // Or fetch the type dynamically
-            scheduleCallId={selectedScheduleId}  // Use selectedScheduleId here
+            scheduleCallId={selectedScheduleId}
             onClose={handleCloseModal}
           />
         )}

@@ -29,7 +29,7 @@ const AdminLogin = () => {
 
             // Store the token in localStorage
             localStorage.setItem('token', token);
-            navigate('/admin/dashboard');
+            navigate('/admin/dashboard/doctor-list');
             // Update the Redux state
             dispatch(setLoginState({ isLoggedIn: true, token }));
             toast.success("Signed In Successfully!", { autoClose: 3000 });

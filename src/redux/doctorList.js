@@ -17,6 +17,7 @@ export const fetchClinics = createAsyncThunk(
           }
         );
         return response.data;
+        console.log(response)
       } else {
         return rejectWithValue("No token found in localStorage");
       }
@@ -50,6 +51,40 @@ export const deleteClinic = createAsyncThunk(
     }
   }
 );
+
+
+
+
+// Archive clinic thunk with console logs
+export const archiveClinic = createAsyncThunk(
+  "doctorList/archiveClinic",
+  async ({ clinicId }, { rejectWithValue, getState }) => {
+    try {
+      // Retrieve token from localStorage (or Redux state if you use it for auth)
+      const token = localStorage.getItem("token"); 
+
+      // Check if token is missing
+      if (!token) {
+        throw new Error("No token found! Please log in.");
+      }
+
+      const response = await axios.post(
+        `https://mnlifescience.vercel.app/api/admin/archieve-clinic`,
+        { clinicId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request headers
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to archive clinic");
+    }
+  }
+);
+
 
 
 const initialDateRange = {
@@ -116,6 +151,19 @@ const doctorListSlice = createSlice({
         state.filteredClinics = state.filteredClinics.filter(clinic => clinic._id !== action.payload);
       })
       .addCase(deleteClinic.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(archiveClinic.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(archiveClinic.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Remove the deleted clinic from the state using the returned ID
+        state.clinics = state.clinics.filter(clinic => clinic._id !== action.payload);
+        state.filteredClinics = state.filteredClinics.filter(clinic => clinic._id !== action.payload);
+      })
+      .addCase(archiveClinic.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

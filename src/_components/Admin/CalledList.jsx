@@ -33,7 +33,7 @@ const CalledList = () => {
     <div>
       <Navbar />
 
-      <div className="overflow-x-auto mt-3">
+      <div className="overflow-x-auto mt-16">
         <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
           <thead className="text-left">
             <tr>

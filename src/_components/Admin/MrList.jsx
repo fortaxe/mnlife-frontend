@@ -85,17 +85,19 @@ const MrList = () => {
         if (newPassword === confirmPassword) {
             try {
                 const token = localStorage.getItem("token");
-    
+
                 // Prepare only necessary data for the request
                 const data = {
                     id: currentMrId,
                     newPassword,
                     confirmPassword,
                 };
-    
+
+                console.log("Data being sent to backend:", data);
+
                 // Make the API request
-                const response = await axios.post(
-                    "https://mnlifescience.vercel.app/api/editMr",
+                const response = await axios.patch(
+                    "https://mnlifescience.vercel.app/api/admin/edit-mr",
                     data,
                     {
                         headers: {
@@ -103,7 +105,9 @@ const MrList = () => {
                         },
                     }
                 );
-    
+
+                console.log("Response from backend:", response.data);
+
                 // Handle response
                 if (response.status === 200) {
                     toast.success('Password updated successfully');
@@ -112,16 +116,16 @@ const MrList = () => {
                     toast.error('Error updating password');
                 }
             } catch (error) {
-                console.error('Error updating password:', error);
+                console.error('Error updating password:', error.response ? error.response.data : error.message);
                 toast.error('Failed to update password');
             }
         } else {
             toast.error('Passwords do not match!');
         }
     };
-    
-    
-    
+
+
+
     const handleUpdateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem("token");
@@ -139,7 +143,7 @@ const MrList = () => {
     return (
         <div>
             <Navbar />
-            <div className="overflow-x-auto mt-2">
+            <div className="overflow-x-auto mt-16">
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="text-left">
                         <tr>
@@ -178,10 +182,18 @@ const MrList = () => {
                                     </DropdownMenu>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr.aadhaarCard })}>
-                                    View Aadhaar
+                                    {mr.aadhaarCard ? (
+                                        <span>View Aadhaar</span>
+                                    ) : (
+                                        <span className="text-red-500">No Aadhaar Card provided</span>
+                                    )}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'PAN', url: mr.panCard })}>
-                                    View PAN
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
+                                    {mr.panCard ? (
+                                        <span onClick={() => openModal({ type: 'PAN', url: mr.panCard })}>View PAN</span>
+                                    ) : (
+                                        <span className="text-red-500">No Pan Card provided</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}

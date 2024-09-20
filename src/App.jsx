@@ -12,6 +12,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Appointments from "./_components/Admin/Appointments";
 import CalledList from "./_components/Admin/CalledList";
+import ArchiveList from "./_components/Admin/archive";
 
 function App() {
   return (
@@ -30,12 +31,12 @@ function App() {
             <Route path="mr-list" element={<MrList />} />
             <Route path="appointments" element={<Appointments />} />
             <Route path="called-list" element={<CalledList />} />
+            <Route path="archive" element={<ArchiveList />} />
           </Route>
 
         {/* User Dashboard*/}
           <Route path="/dashboard" element={<UserSidebar />}>
             <Route path="/dashboard/add-doctor" element={<AddDoctorForm />} />
-                      
           </Route>   
 
         </Routes>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -15,6 +15,9 @@ const ChangeCredentials = () => {
   const validationSchema = Yup.object({
     newEmail: Yup.string().email("Invalid email address").required("Email is required"),
     newPassword: Yup.string().required("Password is required"),
+    confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+    .required("Confirm password is required"), // Added validation for confirmPassword
   });
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
@@ -38,7 +41,7 @@ const ChangeCredentials = () => {
       // Make the POST request to change credentials
       const response = await axios.patch(
         endpoint,
-        { newEmail: values.newEmail, newPassword: values.newPassword },
+        { newEmail: values.newEmail, newPassword: values.newPassword, confirmPassword: values.confirmPassword },
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -92,7 +95,7 @@ const ChangeCredentials = () => {
 
                 <div>
                   <label htmlFor="newPassword" className="block text-gray-700 mb-2">
-                    Password
+                    New Password
                   </label>
                   <Field
                     id="newPassword"
@@ -103,6 +106,23 @@ const ChangeCredentials = () => {
                   />
                   <ErrorMessage
                     name="newPassword"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-gray-700 mb-2">
+                    Confirm Password
+                  </label>
+                  <Field
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    className="w-full p-2 rounded bg-[#F2F2F2] border border-gray-300"
+                    style={{ width: "366px" }}
+                  />
+                  <ErrorMessage
+                    name="confirmPassword"
                     component="div"
                     className="text-red-500 text-sm mt-1"
                   />
@@ -124,7 +144,6 @@ const ChangeCredentials = () => {
           )}
         </Formik>
       </div>
-      <ToastContainer />
     </div>
   );
 };

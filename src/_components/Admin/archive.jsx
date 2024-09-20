@@ -1,39 +1,32 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import moment from "moment";
-import { Edit, ChevronDown, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ScheduleModal from "./ScheduleModal";
 import MapPopup from "../Mapbox/MapboxMap";
 import { Input } from "@/components/ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import EditClinicModal from "./EditClinicModal";
-import AdminNavbar from "./AdminNavbar";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchClinics, deleteClinic, archiveClinic } from "@/redux/doctorList";
+import { fetchArchivedClinics } from "@/redux/archiveList";
 import 'react-toastify/dist/ReactToastify.css';
+import { deleteClinic } from "@/redux/doctorList";
+import Navbar from "./Navbar";
 
-const DoctorList = () => {
+const ArchiveList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedClinic, setSelectedClinic] = useState(null);
     const [scheduleType, setScheduleType] = useState('');
     const [isMapPopupOpen, setIsMapPopupOpen] = useState(false);
     const [mapCoordinates, setMapCoordinates] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
 
     const dispatch = useDispatch();
-    const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
-
+    const { archivedClinics } = useSelector((state) => state.archiveList);
 
     useEffect(() => {
-        // Dispatch the fetchClinics action when the component loads
-        dispatch(fetchClinics());
+        dispatch(fetchArchivedClinics());
+        console.log(fetchArchivedClinics)
     }, [dispatch]);
 
     if (status === "loading") {
@@ -57,10 +50,9 @@ const DoctorList = () => {
     };
 
     const handleUpdateClinic = () => {
-        fetchClinics(); // Refresh the entire list
+        dispatch(fetchArchivedClinics());
         toast.success("Clinic updated successfully");
     };
-
 
     const handleDeleteClinic = async (id) => {
         try {
@@ -71,19 +63,18 @@ const DoctorList = () => {
         }
     };
 
-    const handleArchiveClinic = async (clinicId) => {
-        try {
-            await dispatch(archiveClinic({ clinicId }));
-            toast.success("Doctor Archived successfully");
-        } catch (err) {
-            toast.error(err || "Failed to Archive clinic");
-        }
-    };
+    // const handleUnarchiveClinic = async (clinicId) => {
+    //     try {
+    //         await dispatch(unarchiveClinic({ clinicId }));
+    //         toast.success("Clinic unarchived successfully");
+    //     } catch (err) {
+    //         toast.error(err || "Failed to unarchive clinic");
+    //     }
+    // };
 
     return (
         <div>
-            <AdminNavbar />
-
+            <Navbar />
             <div className="overflow-x-auto mt-[80px] w-full p-0 m-0">
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="ltr:text-left rtl:text-right ">
@@ -104,7 +95,7 @@ const DoctorList = () => {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
-                        {filteredClinics.map((clinic, index) => (
+                        {archivedClinics.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={index} style={{ height: "80px" }}>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
@@ -114,8 +105,8 @@ const DoctorList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {moment(clinic.createdAt).format('D MMM YYYY')}
-                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic._id)}>
-                                        Archive
+                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleUnarchiveClinic(clinic._id)}>
+                                        Unarchive
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
@@ -138,7 +129,7 @@ const DoctorList = () => {
                                             className="mr-2"
                                         />
                                         <label htmlFor={`doctor-contacted-${clinic._id}`} className="text-sm">
-                                            What's App Contacted
+                                            WhatsApp Contacted
                                         </label>
                                     </div>
                                 </td>
@@ -166,29 +157,12 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
-                                {/* <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
-                                    onClick={() => handleLocationClick(clinic.location.coordinates)}>
-                                    {clinic.location.coordinates ? "Location" : "No Location"}
-
-                                </td> */}
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
                                     {clinic.location.coordinates && clinic.location.coordinates.length > 0
-                                        ? "Location"
+                                        ? <span onClick={() => handleLocationClick(clinic.location.coordinates)}>Location</span>
                                         : "No location"}
                                 </td>
-
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {/* <DropdownMenu>
-                                        <DropdownMenuTrigger className="flex items-center">
-                                            {clinic.grade}
-                                            <ChevronDown className="ml-2" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem>A</DropdownMenuItem>
-                                            <DropdownMenuItem>B</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu> */}
-
                                     {clinic.grade}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.createdBy.name}</td>
@@ -228,4 +202,4 @@ const DoctorList = () => {
     );
 };
 
-export default DoctorList;
+export default ArchiveList;
