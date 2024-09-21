@@ -15,7 +15,7 @@ import {
 import EditClinicModal from "./EditClinicModal";
 import AdminNavbar from "./AdminNavbar";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchClinics, deleteClinic, archiveClinic } from "@/redux/doctorList";
+import { fetchClinics, deleteClinic, archiveClinic, updateClinic } from "@/redux/doctorList";
 import 'react-toastify/dist/ReactToastify.css';
 
 const DoctorList = () => {
@@ -26,6 +26,8 @@ const DoctorList = () => {
     const [mapCoordinates, setMapCoordinates] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [loadingClinicId, setLoadingClinicId] = useState(null);
+    
 
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
@@ -35,10 +37,6 @@ const DoctorList = () => {
         // Dispatch the fetchClinics action when the component loads
         dispatch(fetchClinics());
     }, [dispatch]);
-
-    if (status === "loading") {
-        return <div>Loading...</div>;
-    }
 
     const openScheduleModal = (clinic, type) => {
         setSelectedClinic(clinic);
@@ -56,11 +54,27 @@ const DoctorList = () => {
         setIsEditModalOpen(true);
     };
 
-    const handleUpdateClinic = () => {
-        fetchClinics(); // Refresh the entire list
-        toast.success("Clinic updated successfully");
+    const handleUpdateClinic = (updatedClinic) => {
+        dispatch(updateClinic(updatedClinic))
+            .unwrap()
+            .then(() => {
+                toast.success("Clinic updated successfully");
+    
+                // Update only the selected clinic in local state
+                setSelectedClinic(updatedClinic);
+    
+                // Optionally, you can also update the filteredClinics state
+                const updatedClinics = filteredClinics.map(clinic =>
+                    clinic._id === updatedClinic._id ? updatedClinic : clinic
+                );
+                // Update the local state if you want to reflect changes in the table
+                dispatch(fetchClinics(updatedClinics)); // If you have a way to set this in your redux store
+                setIsEditModalOpen(false);
+            })
+            .catch((error) => {
+                toast.error(error || "Failed to update clinic");
+            });
     };
-
 
     const handleDeleteClinic = async (id) => {
         try {
@@ -72,11 +86,14 @@ const DoctorList = () => {
     };
 
     const handleArchiveClinic = async (clinicId) => {
+        setLoadingClinicId(clinicId);
         try {
             await dispatch(archiveClinic({ clinicId }));
             toast.success("Doctor Archived successfully");
         } catch (err) {
             toast.error(err || "Failed to Archive clinic");
+        } finally {
+            setLoadingClinicId(null);
         }
     };
 
@@ -105,7 +122,7 @@ const DoctorList = () => {
 
                     <tbody className="divide-y divide-gray-200">
                         {filteredClinics.map((clinic, index) => (
-                            <tr className="odd:bg-gray-50" key={index} style={{ height: "80px" }}>
+                            <tr className="odd:bg-gray-50" key={clinic._id} style={{ height: "80px" }}>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
                                 </td>
@@ -166,16 +183,16 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
-                                {/* <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
                                     onClick={() => handleLocationClick(clinic.location.coordinates)}>
-                                    {clinic.location.coordinates ? "Location" : "No Location"}
+                                    {clinic.location.coordinates && clinic.location.coordinates.length > 0 ? "Location" : "No Location"}
 
-                                </td> */}
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
+                                </td>
+                                {/* <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
                                     {clinic.location.coordinates && clinic.location.coordinates.length > 0
                                         ? "Location"
                                         : "No location"}
-                                </td>
+                                </td> */}
 
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {/* <DropdownMenu>
@@ -216,11 +233,13 @@ const DoctorList = () => {
                     />
                 )}
 
+
                 {isEditModalOpen && (
                     <EditClinicModal
                         clinic={selectedClinic}
                         onClose={() => setIsEditModalOpen(false)}
                         onUpdate={handleUpdateClinic}
+                        isLoading={loadingClinicId === selectedClinic._id}
                     />
                 )}
             </div>

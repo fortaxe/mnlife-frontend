@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from "react-toastify";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ClipLoader } from "react-spinners";
 import {
     Select,
     SelectContent,
@@ -24,14 +26,7 @@ const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
         doctorWhatsAppContacted: clinic.doctorWhatsAppContacted,
         pharmacyWhatsAppContacted: clinic.pharmacyWhatsAppContacted,
     });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCheckboxChange = (name) => {
         setFormData(prevState => ({
@@ -40,26 +35,14 @@ const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        try {
-            const token = localStorage.getItem("token");
-            await axios.patch(
-                "https://mnlifescience.vercel.app/api/admin/edit-clinic",
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            onUpdate(); // Call onUpdate without parameters
-            onClose();
-        } catch (error) {
-            console.error("Error updating clinic:", error);
-        }
+        onUpdate(formData); // Pass the updated data back to DoctorList
     };
 
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg w-96">
@@ -141,8 +124,10 @@ const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
                         </label>
                     </div>
                     <div className="flex justify-end">
-                        <Button type="submit" className="mr-2">Save</Button>
-                        <Button onClick={onClose} variant="outline">Cancel</Button>
+                        <Button type="submit" className="mr-2" disabled={isLoading}>
+                            {isLoading ? <ClipLoader color="#123abc" loading={true} size={50} /> : "Save"}
+                        </Button>
+                        <Button onClick={onClose} variant="outline" disabled={isLoading}>Cancel</Button>
                     </div>
                 </form>
             </div>

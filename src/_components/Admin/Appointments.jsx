@@ -25,6 +25,7 @@ import {
 import { toast } from "react-toastify";
 import ScheduleModal from './ScheduleModal';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -34,11 +35,11 @@ const Appointments = () => {
   const [notes, setNotes] = useState("");
   const [isEditing, setIsEditing] = useState(false); // Editing mode managed by Dialog
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingId, setLoadingId] = useState(null);
 
   useEffect(() => {
     fetchSchedules();
   }, [dispatch]);
-
 
   const fetchSchedules = async () => {
     try {
@@ -74,6 +75,8 @@ const Appointments = () => {
         "Content-Type": "application/json",
       };
 
+      setLoadingId(scheduleCallId);
+
       await axios.patch(
         `https://mnlifescience.vercel.app/api/schedule/update-status`,
         { scheduleCallId, updateStatus: newStatus },
@@ -98,6 +101,8 @@ const Appointments = () => {
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update status");
+    } finally {
+      setLoadingId(null);
     }
   };
   const handleNotesChange = (event) => {
@@ -154,7 +159,11 @@ const Appointments = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                    {call.status === "Scheduled" ? "Update Status" : call.status}
+                  {loadingId === call.scheduleCallId ? (
+            <CircularProgress size={24} />
+          ) : (
+            call.status === "Scheduled" ? "Update Status" : call.status
+          )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
@@ -227,7 +236,11 @@ const Appointments = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                    {call.status === "Scheduled" ? "Update Status" : call.status}
+                  {loadingId === call.scheduleCallId ? (
+            <CircularProgress size={24} />
+          ) : (
+            call.status === "Scheduled" ? "Update Status" : call.status
+          )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
@@ -245,7 +258,7 @@ const Appointments = () => {
                   {call.doctorNumber && <p>{call.doctorNumber}</p>}
                   {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
                 </div>
-                
+
                 <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
                   <DialogTrigger asChild>
                     <Button

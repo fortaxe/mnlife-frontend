@@ -42,7 +42,7 @@ export const deleteClinic = createAsyncThunk(
             data: { id } // Move the id to the data property
           }
         );
-        return response.data;
+        return id;
       } else {
         return rejectWithValue("No token found in localStorage");
       }
@@ -52,8 +52,30 @@ export const deleteClinic = createAsyncThunk(
   }
 );
 
-
-
+export const updateClinic = createAsyncThunk(
+  "doctorList/updateClinic",
+  async (updatedClinic, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.patch(
+          "https://mnlifescience.vercel.app/api/admin/edit-clinic",
+          updatedClinic,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return updatedClinic;
+      } else {
+        return rejectWithValue("No token found in localStorage");
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update clinic");
+    }
+  }
+);
 
 // Archive clinic thunk with console logs
 export const archiveClinic = createAsyncThunk(
@@ -78,7 +100,7 @@ export const archiveClinic = createAsyncThunk(
         }
       );
 
-      return response.data;
+      return { clinicId };
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to archive clinic");
     }
@@ -146,7 +168,7 @@ const doctorListSlice = createSlice({
       })
       .addCase(deleteClinic.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Remove the deleted clinic from the state using the returned ID
+        // Use the ID from the action payload to remove the deleted clinic
         state.clinics = state.clinics.filter(clinic => clinic._id !== action.payload);
         state.filteredClinics = state.filteredClinics.filter(clinic => clinic._id !== action.payload);
       })
@@ -159,15 +181,31 @@ const doctorListSlice = createSlice({
       })
       .addCase(archiveClinic.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Remove the deleted clinic from the state using the returned ID
-        state.clinics = state.clinics.filter(clinic => clinic._id !== action.payload);
-        state.filteredClinics = state.filteredClinics.filter(clinic => clinic._id !== action.payload);
+        // Remove the archived clinic using the clinicId from the action payload
+        state.clinics = state.clinics.filter(clinic => clinic._id !== action.payload.clinicId);
+        state.filteredClinics = state.filteredClinics.filter(clinic => clinic._id !== action.payload.clinicId);
       })
       .addCase(archiveClinic.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(updateClinic.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateClinic.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const index = state.clinics.findIndex(clinic => clinic._id === action.payload._id);
+        if (index !== -1) {
+          state.clinics[index] = action.payload; // Update the specific clinic
+        }
+        state.filteredClinics = filterClinics(state);
+      })
+      .addCase(updateClinic.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       });
-  },
+  }
+  
 });
 
 const filterClinics = (state) => {

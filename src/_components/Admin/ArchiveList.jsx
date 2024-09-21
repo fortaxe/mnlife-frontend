@@ -8,7 +8,7 @@ import MapPopup from "../Mapbox/MapboxMap";
 import { Input } from "@/components/ui/input";
 import EditClinicModal from "./EditClinicModal";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArchivedClinics } from "@/redux/archiveList";
+import { fetchArchivedClinics, unArchiveClinic } from "@/redux/archiveList";
 import 'react-toastify/dist/ReactToastify.css';
 import { deleteClinic } from "@/redux/doctorList";
 import Navbar from "./Navbar";
@@ -63,14 +63,14 @@ const ArchiveList = () => {
         }
     };
 
-    // const handleUnarchiveClinic = async (clinicId) => {
-    //     try {
-    //         await dispatch(unarchiveClinic({ clinicId }));
-    //         toast.success("Clinic unarchived successfully");
-    //     } catch (err) {
-    //         toast.error(err || "Failed to unarchive clinic");
-    //     }
-    // };
+    const handleUnarchiveClinic = async (clinicId) => {
+        try {
+            await dispatch(unArchiveClinic({ clinicId }));
+            toast.success("Clinic unarchived successfully");
+        } catch (err) {
+            toast.error(err || "Failed to unarchive clinic");
+        }
+    };
 
     return (
         <div>

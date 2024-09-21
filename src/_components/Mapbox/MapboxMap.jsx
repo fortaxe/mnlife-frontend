@@ -6,24 +6,43 @@ const MapPopup = ({ coordinates, onClose }) => {
   const mapContainer = useRef(null); // Reference to the map container
 
   useEffect(() => {
-    if (!coordinates) return; // Return if no coordinates
+    if (!coordinates || coordinates.length < 2) {
+      console.error("Invalid coordinates:", coordinates);
+      return; // Return if no valid coordinates
+    }
+
+    console.log("Coordinates received:", coordinates);
 
     // Initialize Mapbox map
     mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hcm5hdGg0NTQ1IiwiYSI6ImNtMTdtNXJseDB0emIya3M4eDQ2NTU0cnkifQ.jkCDiJD2DivJDQMp9WWDog';
-    const map = new mapboxgl.Map({
-      container: mapContainer.current, // Container ID from the ref
-      style: 'mapbox://styles/mapbox/streets-v11', // Map style
-      center: coordinates, // Initial map center
-      zoom: 12 // Initial zoom level
-    });
+    
+    try {
+      const map = new mapboxgl.Map({
+        container: mapContainer.current, // Container ID from the ref
+        style: 'mapbox://styles/mapbox/streets-v11', // Map style
+        center: coordinates, // Initial map center (lng, lat)
+        zoom: 12 // Initial zoom level
+      });
 
-    // Add a marker to the map
-    new mapboxgl.Marker()
-      .setLngLat(coordinates)
-      .addTo(map);
+      console.log("Map initialized with center:", coordinates);
 
-    // Clean up map instance on unmount
-    return () => map.remove();
+      // Add a marker to the map at the given coordinates
+      new mapboxgl.Marker()
+        .setLngLat(coordinates)
+        .addTo(map);
+
+      console.log("Marker added at:", coordinates);
+
+      // Clean up map instance on unmount
+      return () => {
+        map.remove();
+        console.log("Map instance removed");
+      };
+
+    } catch (error) {
+      console.error("Error initializing Mapbox:", error);
+    }
+
   }, [coordinates]);
 
   return (

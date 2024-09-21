@@ -12,7 +12,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Appointments from "./_components/Admin/Appointments";
 import CalledList from "./_components/Admin/CalledList";
-import ArchiveList from "./_components/Admin/archive";
+import ArchiveList from "./_components/Admin/ArchiveList";
 
 function App() {
   return (
@@ -22,7 +22,6 @@ function App() {
           <Route path="/admin/signin" element={<AdminLogin />} />
           <Route path="/admin/change-credentials" element={<ChangeCredentials />} />
           <Route path="/" element={<UserLogin />} />
-          
 
           {/* Admin Dashboard*/}
           <Route path="/admin/dashboard" element={<Sidebar />}>
