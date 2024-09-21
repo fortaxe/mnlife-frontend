@@ -165,7 +165,7 @@ const ArchiveList = () => {
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.grade}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.createdBy.name}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">  {clinic.createdBy && clinic.createdBy.name ? clinic.createdBy.name : "MR Deleted"}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
                                     <Input className="w-[300px] h-[50px]" value={clinic.notes} readOnly />
