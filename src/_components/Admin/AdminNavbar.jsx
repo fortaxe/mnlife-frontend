@@ -133,7 +133,7 @@ const AdminNavbar = () => {
     toast.success("Signed out Successfully!", { autoClose: 3000 });
   };
 
-  const mrList = [...new Set(clinics.map(clinic => clinic.createdBy.name))];
+  const mrList = [...new Set(clinics.map(clinic => clinic.createdBy?.name || "N/A"))];
 
   useEffect(() => {
     const handleResize = () => {

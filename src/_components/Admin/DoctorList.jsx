@@ -16,6 +16,7 @@ import AdminNavbar from "./AdminNavbar";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchClinics, deleteClinic, archiveClinic, updateClinic } from "@/redux/doctorList";
 import 'react-toastify/dist/ReactToastify.css';
+import LocationModal from "./LocationModal";
 
 const DoctorList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,7 +25,6 @@ const DoctorList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [loadingClinicId, setLoadingClinicId] = useState(null);
-    
 
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
@@ -41,11 +41,6 @@ const DoctorList = () => {
         setIsModalOpen(true);
     };
 
-    const handleLocationClick = (coordinates) => {
-        setMapCoordinates(coordinates);
-        setIsMapPopupOpen(true);
-    };
-
     const handleEditClick = (clinic) => {
         setSelectedClinic(clinic);
         setIsEditModalOpen(true);
@@ -56,10 +51,10 @@ const DoctorList = () => {
             .unwrap()
             .then(() => {
                 toast.success("Clinic updated successfully");
-    
+
                 // Update only the selected clinic in local state
                 setSelectedClinic(updatedClinic);
-    
+
                 // Optionally, you can also update the filteredClinics state
                 const updatedClinics = filteredClinics.map(clinic =>
                     clinic._id === updatedClinic._id ? updatedClinic : clinic
@@ -180,10 +175,13 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
-                                    onClick={() => handleLocationClick(clinic.url)}>
+                                <td
+                                    className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
+                                    onClick={() => clinic.url && window.open(clinic.url, "_blank")}
+                                >
                                     {clinic.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
+
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {/* <DropdownMenu>
                                         <DropdownMenuTrigger className="flex items-center">
@@ -198,7 +196,10 @@ const DoctorList = () => {
 
                                     {clinic.grade}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.createdBy.name}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic.createdBy && clinic.createdBy.name ? clinic.createdBy.name : "N/A"}
+                                </td>
+
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
                                     <Input className="w-[300px] h-[50px]" value={clinic.notes} readOnly />
