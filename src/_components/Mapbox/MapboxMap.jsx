@@ -1,49 +1,69 @@
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS
+import React, { useEffect, useState } from 'react';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 
-const MapPopup = ({ coordinates, onClose }) => {
-  const mapContainer = useRef(null); // Reference to the map container
+const containerStyle = {
+  width: '100%',
+  height: '400px'
+};
+
+const GoogleMapPopup = ({ coordinates, onClose }) => {
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey:"AIzaSyC-Jbo_NrZEm0AP0IB5GxIar4Rpbq7gxlQ",
+    libraries: ['marker']
+  });
 
   useEffect(() => {
-    if (!coordinates || coordinates.length < 2) {
+    console.log("Coordinates changed:", coordinates);
+    if (!coordinates || coordinates.length !== 2) {
       console.error("Invalid coordinates:", coordinates);
-      return; // Return if no valid coordinates
+    } else {
+      console.log("Latitude:", coordinates[1], "Longitude:", coordinates[0]);
     }
+  }, [coordinates]);
 
-    console.log("Coordinates received:", coordinates);
+  const onLoad = React.useCallback(function callback(map) {
+    console.log("Map loaded successfully");
+    setMap(map);
+  }, []);
 
-    // Initialize Mapbox map
-    mapboxgl.accessToken = 'pk.eyJ1IjoiYW1hcm5hdGg0NTQ1IiwiYSI6ImNtMTdtNXJseDB0emIya3M4eDQ2NTU0cnkifQ.jkCDiJD2DivJDQMp9WWDog';
-    
-    try {
-      const map = new mapboxgl.Map({
-        container: mapContainer.current, // Container ID from the ref
-        style: 'mapbox://styles/mapbox/streets-v11', // Map style
-        center: coordinates, // Initial map center (lng, lat)
-        zoom: 12 // Initial zoom level
+  const onUnmount = React.useCallback(function callback(map) {
+    console.log("Map unmounted");
+    setMap(null);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded && map && coordinates) {
+      // Remove existing marker if any
+      if (marker) {
+        marker.setMap(null);
+      }
+
+      // Create new AdvancedMarkerElement
+      const { AdvancedMarkerElement } = window.google.maps.marker;
+      const newMarker = new AdvancedMarkerElement({
+        map,
+        position: { lat: coordinates[1], lng: coordinates[0] },
       });
 
-      console.log("Map initialized with center:", coordinates);
-
-      // Add a marker to the map at the given coordinates
-      new mapboxgl.Marker()
-        .setLngLat(coordinates)
-        .addTo(map);
-
-      console.log("Marker added at:", coordinates);
-
-      // Clean up map instance on unmount
-      return () => {
-        map.remove();
-        console.log("Map instance removed");
-      };
-
-    } catch (error) {
-      console.error("Error initializing Mapbox:", error);
+      setMarker(newMarker);
     }
+  }, [isLoaded, map, coordinates, marker]);
 
-  }, [coordinates]);
+  if (loadError) {
+    console.error("Error loading Google Maps:", loadError);
+    return <div className="p-4 text-red-500">Error loading maps. Please check your API key and billing status.</div>;
+  }
+
+  if (!isLoaded) {
+    console.log("Google Maps API is loading");
+    return <div className="p-4">Loading maps...</div>;
+  }
+
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -54,10 +74,18 @@ const MapPopup = ({ coordinates, onClose }) => {
         >
           &times;
         </button>
-        <div ref={mapContainer} style={{ height: '400px' }} />
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={{lat: coordinates[1], lng: coordinates[0]}}
+          zoom={10}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+        >
+          {/* Marker is now handled in useEffect */}
+        </GoogleMap>
       </div>
     </div>
   );
 };
 
-export default MapPopup;
+export default GoogleMapPopup;

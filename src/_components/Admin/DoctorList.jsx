@@ -4,7 +4,6 @@ import moment from "moment";
 import { Edit, ChevronDown, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ScheduleModal from "./ScheduleModal";
-import MapPopup from "../Mapbox/MapboxMap";
 import { Input } from "@/components/ui/input";
 import {
     DropdownMenu,
@@ -22,8 +21,6 @@ const DoctorList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedClinic, setSelectedClinic] = useState(null);
     const [scheduleType, setScheduleType] = useState('');
-    const [isMapPopupOpen, setIsMapPopupOpen] = useState(false);
-    const [mapCoordinates, setMapCoordinates] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [loadingClinicId, setLoadingClinicId] = useState(null);
@@ -184,16 +181,9 @@ const DoctorList = () => {
                                     </div>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
-                                    onClick={() => handleLocationClick(clinic.location.coordinates)}>
-                                    {clinic.location.coordinates && clinic.location.coordinates.length > 0 ? "Location" : "No Location"}
-
+                                    onClick={() => handleLocationClick(clinic.url)}>
+                                    {clinic.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
-                                {/* <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                    {clinic.location.coordinates && clinic.location.coordinates.length > 0
-                                        ? "Location"
-                                        : "No location"}
-                                </td> */}
-
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {/* <DropdownMenu>
                                         <DropdownMenuTrigger className="flex items-center">
@@ -225,14 +215,6 @@ const DoctorList = () => {
                         onClose={() => setIsModalOpen(false)}
                     />
                 )}
-
-                {isMapPopupOpen && (
-                    <MapPopup
-                        coordinates={mapCoordinates}
-                        onClose={() => setIsMapPopupOpen(false)}
-                    />
-                )}
-
 
                 {isEditModalOpen && (
                     <EditClinicModal
