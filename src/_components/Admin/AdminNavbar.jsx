@@ -90,7 +90,7 @@ const AdminNavbar = () => {
       Pharmacy_Number: clinic.pharmacyNumber,
       Pharmacy_Whatsapp_Contacted: clinic.pharmacyWhatsAppContacted,
       Grade: clinic.grade,
-      MR_Name: clinic.createdBy.name,
+      MR_Name: clinic?.createdBy?.name,
       Remarks: clinic.remarks,
       Notes: clinic.notes
     }));
@@ -168,7 +168,7 @@ const AdminNavbar = () => {
 
     // Apply MR filter
     if (selectedMR) {
-      filtered = filtered.filter(clinic => clinic.createdBy.name === selectedMR);
+      filtered = filtered.filter(clinic => clinic?.createdBy?.name === selectedMR);
     }
 
     // Apply Grade filter

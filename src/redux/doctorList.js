@@ -221,7 +221,7 @@ const filterClinics = (state) => {
       true;
 
     const matchesGrade = state.selectedGrade ? clinic.grade === state.selectedGrade : true;
-    const matchesMR = state.selectedMR ? clinic.createdBy.name === state.selectedMR : true;
+    const matchesMR = state.selectedMR ? clinic?.createdBy?.name === state.selectedMR : true;
 
     return isInDateRange && matchesGrade && matchesMR;
   });
