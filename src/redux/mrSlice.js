@@ -8,32 +8,34 @@ const initialState = {
     error: null,
 };
 
-// Async thunk for deleting MR
 export const deleteMR = createAsyncThunk(
-    "doctorList/deleteMR",
-    async ({id}, { rejectWithValue }) => {
-      try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const response = await axios.delete(
-            "https://mnlifescience.vercel.app/api/admin/delete-mr",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              data: { id } // Move the id to the data property
+  "doctorList/deleteMR",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.post(
+          "https://mnlifescience.vercel.app/api/admin/delete-mr",
+          {
+            id // MR ID to be deleted
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Attach the token in the header
             }
-          );
-          return id;
-          console.log(response)
-        } else {
-          return rejectWithValue("No token found in localStorage");
-        }
-      } catch (error) {
-        return rejectWithValue(error.message || "An error occurred while deleting the clinic");
+          }
+        );
+        console.log(response);
+        return id;
+      } else {
+        return rejectWithValue("No token found in localStorage");
       }
+    } catch (error) {
+      return rejectWithValue(error.message || "An error occurred while deleting the MR");
     }
-  );
+  }
+);
+
   
 
 // Create the slice

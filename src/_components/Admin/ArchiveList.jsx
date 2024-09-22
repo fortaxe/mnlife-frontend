@@ -79,7 +79,6 @@ const ArchiveList = () => {
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="ltr:text-left rtl:text-right ">
                         <tr>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
@@ -97,9 +96,7 @@ const ArchiveList = () => {
                     <tbody className="divide-y divide-gray-200">
                         {archivedClinics.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={index} style={{ height: "80px" }}>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
-                                </td>
+                               
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic._id)} />
                                 </td>
@@ -120,18 +117,7 @@ const ArchiveList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.doctorNumber}
-                                    <div className="flex items-center mt-2">
-                                        <input
-                                            type="checkbox"
-                                            id={`doctor-contacted-${clinic._id}`}
-                                            checked={clinic.doctorWhatsAppContacted}
-                                            readOnly
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={`doctor-contacted-${clinic._id}`} className="text-sm">
-                                            WhatsApp Contacted
-                                        </label>
-                                    </div>
+                                    
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.pharmacyName}
@@ -144,18 +130,7 @@ const ArchiveList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.pharmacyNumber}
-                                    <div className="flex items-center mt-2">
-                                        <input
-                                            type="checkbox"
-                                            id={`pharmacy-contacted-${clinic._id}`}
-                                            checked={clinic.pharmacyWhatsAppContacted}
-                                            readOnly
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={`pharmacy-contacted-${clinic._id}`} className="text-sm">
-                                            Pharmacy Contacted
-                                        </label>
-                                    </div>
+                                    
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
                                     {clinic.location.coordinates && clinic.location.coordinates.length > 0

@@ -35,8 +35,15 @@ const AdminLogin = () => {
             toast.success("Signed In Successfully!", { autoClose: 3000 });
         } catch (error) {
             console.error('Error during login:', error);
-            setErrors({ general: 'Login failed. Please check your credentials.' });
-            toast.error("Login failed. Please try again.");
+    
+            // Check if the error response is from the server and has a status code
+            if (error.response && error.response.status === 400) {
+                setErrors({ general: 'Invalid credentials. Please try again.' });
+                toast.error("Invalid credentials. Please check your email and password.");
+            } else {
+                setErrors({ general: 'Login failed. Please try again.' });
+                toast.error("Login failed. Please try again.");
+            }
         } finally {
             setSubmitting(false);
         }

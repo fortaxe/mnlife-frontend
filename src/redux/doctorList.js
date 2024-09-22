@@ -16,8 +16,9 @@ export const fetchClinics = createAsyncThunk(
             },
           }
         );
+        console.log(response.data);
         return response.data;
-        console.log(response)
+
       } else {
         return rejectWithValue("No token found in localStorage");
       }
@@ -107,11 +108,9 @@ export const archiveClinic = createAsyncThunk(
   }
 );
 
-
-
-const initialDateRange = {
-  startDate: moment().startOf('month').toDate(),
-  endDate: moment().endOf('month').toDate()
+export const initialDateRange = {
+  startDate: moment().startOf('month').toISOString(),
+  endDate: moment().endOf('month').toISOString()
 };
 
 const doctorListSlice = createSlice({
@@ -127,14 +126,8 @@ const doctorListSlice = createSlice({
   },
   reducers: {
     setDateRange: (state, action) => {
-      // Ensure we have valid date range values
-      const newStartDate = action.payload?.startDate || state.dateRange.startDate;
-      const newEndDate = action.payload?.endDate || state.dateRange.endDate;
-      
-      state.dateRange = {
-        startDate: moment(newStartDate).isValid() ? newStartDate : state.dateRange.startDate,
-        endDate: moment(newEndDate).isValid() ? newEndDate : state.dateRange.endDate
-      };
+      console.log("Setting date range:", action.payload);
+      state.dateRange = action.payload;
       state.filteredClinics = filterClinics(state);
     },
     setSelectedMR: (state, action) => {
@@ -157,6 +150,7 @@ const doctorListSlice = createSlice({
       .addCase(fetchClinics.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.clinics = action.payload;
+        console.log("Filtering clinics with date range:", state.dateRange);
         state.filteredClinics = filterClinics(state);
       })
       .addCase(fetchClinics.rejected, (state, action) => {
@@ -211,10 +205,13 @@ const doctorListSlice = createSlice({
 const filterClinics = (state) => {
   return state.clinics.filter(clinic => {
     const clinicDate = moment(clinic.createdAt);
-    const startDate = moment(state.dateRange.startDate || initialDateRange.startDate);
-    const endDate = moment(state.dateRange.endDate || initialDateRange.endDate);
+    const startDate = moment(state.dateRange.startDate);
+    const endDate = moment(state.dateRange.endDate);
+
+    console.log(`Clinic Date: ${clinicDate}, Start Date: ${startDate}, End Date: ${endDate}`);
     
     const isInDateRange = clinicDate.isBetween(startDate, endDate, null, '[]');
+    console.log(`Clinic ${clinic._id} is in date range: ${isInDateRange}`);
     const matchesGrade = state.selectedGrade ? clinic.grade === state.selectedGrade : true;
     const matchesMR = state.selectedMR ? clinic.createdBy.name === state.selectedMR : true;
 

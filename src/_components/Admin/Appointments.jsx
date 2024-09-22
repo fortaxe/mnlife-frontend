@@ -141,7 +141,7 @@ const Appointments = () => {
     fetchSchedules();
   };
 
-  if (loading) return <div>Loading...</div>;
+
 
   return (
     <div>

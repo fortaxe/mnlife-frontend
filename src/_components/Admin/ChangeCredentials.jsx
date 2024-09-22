@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ChangeCredentials = () => {
+  const navigate = useNavigate();
   const initialValues = {
     newEmail: "",
     newPassword: "",
@@ -52,6 +54,7 @@ const ChangeCredentials = () => {
       // Handle success
       if (response.status === 200) {
         toast.success("Credentials updated successfully!", { autoClose: 3000 });
+        navigate('/admin/signin');
       } else {
         setErrors({ general: "Unexpected response from the server." });
       }

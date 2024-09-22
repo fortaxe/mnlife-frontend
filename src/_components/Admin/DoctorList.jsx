@@ -29,7 +29,6 @@ const DoctorList = () => {
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
 
-
     useEffect(() => {
         // Dispatch the fetchClinics action when the component loads
         dispatch(fetchClinics());
