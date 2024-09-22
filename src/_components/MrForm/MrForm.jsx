@@ -10,6 +10,10 @@ import { Input } from "@/components/ui/input"; // Assuming you're using shadcn's
 const MrForm = () => {
     const [aadhaarCard, setAadhaarCard] = useState(null);
     const [panCard, setPanCard] = useState(null);
+    const [aadhaarError, setAadhaarError] = useState("");
+    const [panError, setPanError] = useState("");
+
+    const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
 
     const initialValues = {
         name: "",
@@ -72,15 +76,38 @@ const MrForm = () => {
             setAadhaarCard(null);
             setPanCard(null);
         } catch (error) {
-            console.error("Error creating MR:", error);
-            setErrors({ general: "Failed to create MR. Please try again." });
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    console.error("Error creating MR:", error);
+    if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+    } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received:", error.request);
+    } else  {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", error.message);
+    }
+    setErrors({ general: "Failed to create MR. Please try again." });
+}
+    }
+    // const handleFileSelect = (event, setFile) => {
+    //     setFile(event.target.files[0]);
+    // };
 
-    const handleFileSelect = (event, setFile) => {
-        setFile(event.target.files[0]);
+    const handleFileSelect = (event, setFile, setError) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (!allowedFileTypes.includes(file.type)) {
+                setError("Invalid file format. Only jpg, jpeg, png, and pdf are allowed.");
+                setFile(null);
+            } else {
+                setError(""); // Clear error if valid
+                setFile(file);
+            }
+        }
     };
 
     return (
@@ -231,29 +258,37 @@ const MrForm = () => {
                                             id="aadhaarCard"
                                             type="file"
                                             className="hidden"
-                                            onChange={(event) => handleFileSelect(event, setAadhaarCard)}
+                                            onChange={(event) => handleFileSelect(event, setAadhaarCard, setAadhaarError)}
                                         />
                                         {aadhaarCard && (
                                             <span className="text-green-600 ml-2">Aadhaar selected</span>
                                         )}
+                                        {aadhaarError && (
+                                            <div className="text-red-500 text-sm mt-1">{aadhaarError}</div>
+                                        )}
                                     </div>
 
                                     <div>
-                                        <span
-                                            className="text-blue-800 cursor-pointer"
-                                            onClick={() => document.getElementById("panCard").click()}
-                                        >
-                                            Upload PAN Card
-                                        </span>
-                                        <input
-                                            id="panCard"
-                                            type="file"
-                                            className="hidden"
-                                            onChange={(event) => handleFileSelect(event, setPanCard)}
-                                        />
-                                        {panCard && <span className="text-green-600 ml-2">PAN selected</span>}
-                                    </div>
+                                    <span
+                                        className="text-blue-800 cursor-pointer"
+                                        onClick={() => document.getElementById("panCard").click()}
+                                    >
+                                        Upload PAN Card
+                                    </span>
+                                    <input
+                                        id="panCard"
+                                        type="file"
+                                        className="hidden"
+                                        onChange={(event) => handleFileSelect(event, setPanCard, setPanError)}
+                                    />
+                                    {panCard && (
+                                        <span className="text-green-600 ml-2">PAN selected</span>
+                                    )}
+                                    {panError && (
+                                        <div className="text-red-500 text-sm mt-1">{panError}</div>
+                                    )}
                                 </div>
+                            </div>
 
                                 {errors.general && (
                                     <div className="text-red-500 text-sm mb-4">{errors.general}</div>
@@ -274,7 +309,6 @@ const MrForm = () => {
                     </Formik>
                 </div>
             </div>
-            <ToastContainer />
         </div>
     );
 };

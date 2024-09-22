@@ -96,7 +96,6 @@ const AdminLogin = () => {
                         </Form>
                     )}
                 </Formik>
-                <ToastContainer />
             </div>
         </div>
     );
