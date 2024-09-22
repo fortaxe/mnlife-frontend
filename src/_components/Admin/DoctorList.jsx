@@ -100,6 +100,7 @@ const DoctorList = () => {
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Number</th>
@@ -136,6 +137,9 @@ const DoctorList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic.speciality && clinic.speciality }
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.doctorNumber}
                                     <div className="flex items-center mt-2">
                                         <input
@@ -150,6 +154,7 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
+                                
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.pharmacyName}
                                     <button

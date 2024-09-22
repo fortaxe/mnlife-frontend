@@ -22,7 +22,9 @@ const MrForm = () => {
 
     const validationSchema = Yup.object({
         name: Yup.string().required("Full Name is Required"),
-        mobileNumber: Yup.string().required("Required"),
+        mobileNumber: Yup.string()
+        .length(10, "Mobile Number must be exactly 10 digits")
+        .required("Mobile Number is Required"),      
         password: Yup.string().required("Required"),
         confirmPassword: Yup.string()
             .oneOf([Yup.ref("password"), null], "Passwords must match")
