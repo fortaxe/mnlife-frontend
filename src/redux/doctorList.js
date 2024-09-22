@@ -109,8 +109,8 @@ export const archiveClinic = createAsyncThunk(
 );
 
 export const initialDateRange = {
-  startDate: moment().startOf('month').toISOString(),
-  endDate: moment().endOf('month').toISOString()
+  startDate: null,
+  endDate: null
 };
 
 const doctorListSlice = createSlice({
@@ -128,6 +128,10 @@ const doctorListSlice = createSlice({
     setDateRange: (state, action) => {
       console.log("Setting date range:", action.payload);
       state.dateRange = action.payload;
+      state.filteredClinics = filterClinics(state);
+    },
+    clearDateRange: (state) => {
+      state.dateRange = initialDateRange;
       state.filteredClinics = filterClinics(state);
     },
     setSelectedMR: (state, action) => {
@@ -203,15 +207,19 @@ const doctorListSlice = createSlice({
 });
 
 const filterClinics = (state) => {
+  if (!state.dateRange.startDate && !state.dateRange.endDate && !state.selectedMR && !state.selectedGrade) {
+    return state.clinics; // Return all clinics if no filters are applied
+  }
+
   return state.clinics.filter(clinic => {
     const clinicDate = moment(clinic.createdAt);
-    const startDate = moment(state.dateRange.startDate);
-    const endDate = moment(state.dateRange.endDate);
+    const startDate = state.dateRange.startDate ? moment(state.dateRange.startDate) : null;
+    const endDate = state.dateRange.endDate ? moment(state.dateRange.endDate) : null;
 
-    console.log(`Clinic Date: ${clinicDate}, Start Date: ${startDate}, End Date: ${endDate}`);
-    
-    const isInDateRange = clinicDate.isBetween(startDate, endDate, null, '[]');
-    console.log(`Clinic ${clinic._id} is in date range: ${isInDateRange}`);
+    const isInDateRange = (startDate && endDate) ? 
+      clinicDate.isBetween(startDate, endDate, null, '[]') : 
+      true;
+
     const matchesGrade = state.selectedGrade ? clinic.grade === state.selectedGrade : true;
     const matchesMR = state.selectedMR ? clinic.createdBy.name === state.selectedMR : true;
 
@@ -219,6 +227,6 @@ const filterClinics = (state) => {
   });
 };
 
-export const { setDateRange, setSelectedMR, setSelectedGrade, setFilteredClinics } = doctorListSlice.actions;
+export const { setDateRange, setSelectedMR, setSelectedGrade, setFilteredClinics, clearDateRange } = doctorListSlice.actions;
 
 export default doctorListSlice.reducer;

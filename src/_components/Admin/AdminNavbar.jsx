@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import * as XLSX from 'xlsx';
 import moment from "moment";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { setDateRange, setSelectedGrade, setSelectedMR, setFilteredClinics } from "@/redux/doctorList";
+import { setDateRange, setSelectedGrade, setSelectedMR, setFilteredClinics, clearDateRange } from "@/redux/doctorList";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import { DateRangePicker } from "@react-spectrum/datepicker";
 import { Provider, defaultTheme } from "@adobe/react-spectrum";
 import { parseDate } from "@internationalized/date";
-import { da } from "date-fns/locale";
+import { da, te } from "date-fns/locale";
 
 
 const AdminNavbar = () => {
@@ -35,9 +35,18 @@ const AdminNavbar = () => {
   const datePickerRef = useRef(null);
   const [localStartDate, setLocalStartDate] = useState(moment(dateRange.startDate).format('YYYY-MM-DD'));
   const [localEndDate, setLocalEndDate] = useState(moment(dateRange.endDate).format('YYYY-MM-DD'));
-  const [tempStartDate, setTempStartDate] = useState(localStartDate);
-  const [tempEndDate, setTempEndDate] = useState(localEndDate);
+  const [tempStartDate, setTempStartDate] = useState(dateRange.startDate ? moment(dateRange.startDate).format('YYYY-MM-DD') : '');
+  const [tempEndDate, setTempEndDate] = useState(dateRange.endDate ? moment(dateRange.endDate).format('YYYY-MM-DD') : '');
 
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchClinics());
+    }
+  }, [status, dispatch]);
+
+  useEffect(() => {
+    console.log("Filtered Clinics:", filteredClinics);
+  }, [filteredClinics]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -141,14 +150,7 @@ const AdminNavbar = () => {
     dispatch(setSelectedGrade(null));
   };
 
-  const clearDateFilter = () => {
-    dispatch(setDateRange(initialDateRange));
-    console.log("Clearing date filter..."); // Log when clearing starts
-    setLocalStartDate(null); // or whatever default value you prefer
-    setLocalEndDate(null);   // or whatever default value you prefer
-    setTempEndDate(null);
-    setTempStartDate(null);
-  };
+
 
   // Apply filters whenever a filter changes
   useEffect(() => {
@@ -215,15 +217,20 @@ const AdminNavbar = () => {
   };
 
   const applyDateFilter = () => {
-    const newStartDate = moment(tempStartDate).startOf('day').toISOString();
-    const newEndDate = moment(tempEndDate).endOf('day').toISOString();
+    const newStartDate = tempStartDate ? moment(tempStartDate).startOf('day').toISOString() : null;
+    const newEndDate = tempEndDate ? moment(tempEndDate).endOf('day').toISOString() : null;
 
-    setLocalStartDate(tempStartDate);
-    setLocalEndDate(tempEndDate);
-    console.log("Applied Date Filter:", newStartDate, newEndDate);
     dispatch(setDateRange({ startDate: newStartDate, endDate: newEndDate }));
     setIsDatePickerOpen(false);
   };
+
+  const clearDateFilter = () => {
+    dispatch(clearDateRange());
+    setTempStartDate('');
+    setTempEndDate('');
+  };
+
+  const isDateRangeSelected = dateRange.startDate !== null || dateRange.endDate !== null;
 
   useEffect(() => {
     console.log("Current Local Start Date:", localStartDate);
@@ -246,13 +253,20 @@ const AdminNavbar = () => {
             <button
               onClick={() => {
                 setIsDatePickerOpen(!isDatePickerOpen);
-                setTempStartDate(localStartDate);
-                setTempEndDate(localEndDate);
+
               }}
               className="text-gray-900 border border-gray-300 bg-[#FBFAD6] font-medium rounded-lg text-sm px-3 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap"
             >
-              Date Range
+              {isDateRangeSelected ? `${moment(dateRange.startDate).format('DD/MM/YYYY')} - ${moment(dateRange.endDate).format('DD/MM/YYYY')}` : 'Date Range'}
             </button>
+            {isDateRangeSelected && (
+            <button
+              onClick={clearDateFilter}
+              className="absolute -right-2 -top-2 bg-red-500 text-white rounded-full p-1"
+            >
+              <X size={12} />
+            </button>
+          )}
           </div>
 
           <div className="relative">
@@ -370,7 +384,7 @@ const AdminNavbar = () => {
         </div>
       )}
 
-      {isDatePickerOpen && (
+{isDatePickerOpen && (
         <div className="absolute top-full left-0 mt-1 bg-white border rounded shadow-lg z-50 p-4 min-w-[250px]">
           <div className="flex flex-col space-y-2">
             <label className="text-sm font-medium text-gray-700">Start Date:</label>
