@@ -13,7 +13,7 @@ const MrForm = () => {
     const [aadhaarError, setAadhaarError] = useState("");
     const [panError, setPanError] = useState("");
 
-    const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png"];
 
     const initialValues = {
         name: "",
@@ -101,7 +101,7 @@ const MrForm = () => {
         const file = event.target.files[0];
         if (file) {
             if (!allowedFileTypes.includes(file.type)) {
-                setError("Invalid file format. Only jpg, jpeg, png, and pdf are allowed.");
+                setError("Invalid file format. Only jpg, jpeg and png are allowed.");
                 setFile(null);
             } else {
                 setError(""); // Clear error if valid
