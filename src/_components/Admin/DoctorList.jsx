@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchClinics, deleteClinic, archiveClinic, updateClinic } from "@/redux/doctorList";
 import 'react-toastify/dist/ReactToastify.css';
 import LocationModal from "./LocationModal";
+import FollowUpModal from "./FollowupModal";
 
 const DoctorList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +26,9 @@ const DoctorList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [loadingClinicId, setLoadingClinicId] = useState(null);
+    const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
+    const [selectedFollowUps, setSelectedFollowUps] = useState([]);
+
 
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
@@ -88,6 +92,16 @@ const DoctorList = () => {
         }
     };
 
+    const openFollowUpModal = (followUps) => {
+        setSelectedFollowUps(followUps);
+        setIsFollowUpModalOpen(true);
+    };
+
+    const closeFollowUpModal = () => {
+        setIsFollowUpModalOpen(false);
+        setSelectedFollowUps([]);
+    };
+
     return (
         <div>
             <AdminNavbar />
@@ -113,7 +127,7 @@ const DoctorList = () => {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
-                        {filteredClinics.map((clinic, index) => (
+                        {filteredClinics && filteredClinics.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={clinic._id} style={{ height: "80px" }}>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
@@ -122,13 +136,13 @@ const DoctorList = () => {
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {moment(clinic.createdAt).format('D MMM YYYY')}
+                                    {clinic.createdAt && moment(clinic.createdAt).format('D MMM YYYY')}
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic._id)}>
                                         Archive
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
-                                    {clinic.doctorName}
+                                    {clinic.doctorName && clinic.doctorName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'doctor')}
@@ -138,9 +152,16 @@ const DoctorList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.speciality && clinic.speciality }
+                                    <button
+                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FBFAD6]"
+                                        onClick={() => openFollowUpModal(clinic.followUps)}
+                                    >
+                                        View Follow-up 
+                                    </button>
                                 </td>
+
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.doctorNumber}
+                                    {clinic.doctorNumber && clinic.doctorNumber}
                                     <div className="flex items-center mt-2">
                                         <input
                                             type="checkbox"
@@ -156,7 +177,7 @@ const DoctorList = () => {
                                 </td>
                                 
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyName}
+                                    {clinic.pharmacyName && clinic.pharmacyName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'pharmacy')}
@@ -165,7 +186,7 @@ const DoctorList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyNumber}
+                                    {clinic.pharmacyNumber && clinic.pharmacyNumber}
                                     <div className="flex items-center mt-2">
                                         <input
                                             type="checkbox"
@@ -198,15 +219,15 @@ const DoctorList = () => {
                                         </DropdownMenuContent>
                                     </DropdownMenu> */}
 
-                                    {clinic.grade}
+                                    {clinic.grade && clinic.grade}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.createdBy && clinic.createdBy.name }
                                 </td>
 
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks && clinic.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
-                                    <Input className="w-[300px] h-[50px]" value={clinic.notes} readOnly />
+                                    <Input className="w-[300px] h-[50px]" value={clinic.notes && clinic.notes} readOnly />
                                 </td>
                             </tr>
                         ))}
@@ -228,6 +249,14 @@ const DoctorList = () => {
                         onUpdate={handleUpdateClinic}
                         isLoading={loadingClinicId === selectedClinic._id}
                     />
+                )}
+
+                {isFollowUpModalOpen && (
+                     <FollowUpModal
+                     isOpen={isFollowUpModalOpen}
+                     onClose={closeFollowUpModal}
+                     followUps={selectedFollowUps}
+                 />
                 )}
             </div>
         </div>

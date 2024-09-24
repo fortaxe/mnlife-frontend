@@ -101,13 +101,13 @@ const ArchiveList = () => {
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {moment(clinic.createdAt).format('D MMM YYYY')}
+                                    {clinic.createdAt && moment(clinic.createdAt).format('D MMM YYYY')}
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleUnarchiveClinic(clinic._id)}>
                                         Unarchive
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
-                                    {clinic.doctorName}
+                                    {clinic.doctorName && clinic.doctorName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'doctor')}
@@ -116,11 +116,11 @@ const ArchiveList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.doctorNumber}
+                                    {clinic.doctorNumber && clinic.doctorNumber}
                                     
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyName}
+                                    {clinic.pharmacyName && clinic.pharmacyName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'pharmacy')}
@@ -129,21 +129,22 @@ const ArchiveList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyNumber}
+                                    {clinic.pharmacyName && clinic.pharmacyNumber}
                                     
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                    {clinic.location.coordinates && clinic.location.coordinates.length > 0
-                                        ? <span onClick={() => handleLocationClick(clinic.location.coordinates)}>Location</span>
-                                        : "No location"}
+                                <td
+                                    className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
+                                    onClick={() => clinic.url && window.open(clinic.url, "_blank")}
+                                >
+                                    {clinic.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.grade}
+                                    {clinic.grade && clinic.grade}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">  {clinic.createdBy && clinic.createdBy.name}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
-                                    <Input className="w-[300px] h-[50px]" value={clinic.notes} readOnly />
+                                    <Input className="w-[300px] h-[50px]" value={clinic.notes && clinic.notes} readOnly />
                                 </td>
                             </tr>
                         ))}

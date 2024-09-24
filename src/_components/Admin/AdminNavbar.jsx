@@ -74,6 +74,8 @@ const AdminNavbar = () => {
   };
 
   const handleExport = () => {
+
+   
     const dataToExport = filteredClinics.length > 0 ? filteredClinics : clinics;
 
     if (dataToExport.length === 0) {
@@ -81,27 +83,34 @@ const AdminNavbar = () => {
       return;
     }
 
-    const exportData = dataToExport.map((clinic) => ({
-      Date: moment(clinic.createdAt).format('D MMM YYYY'),
-      Doctor_Name: clinic.doctorName,
-      Doctor_Number: clinic.doctorNumber,
-      Doctor_Whatsapp_Contacted: clinic.doctorWhatsAppContacted,
-      Pharmacy_Name: clinic.pharmacyName,
-      Pharmacy_Number: clinic.pharmacyNumber,
-      Pharmacy_Whatsapp_Contacted: clinic.pharmacyWhatsAppContacted,
-      Grade: clinic.grade,
-      MR_Name: clinic?.createdBy?.name,
-      Remarks: clinic.remarks,
-      Notes: clinic.notes
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Clinics");
-    XLSX.writeFile(wb, "doctor_list.xlsx");
-
-    toast.success("Data exported successfully!");
-  };
+    const exportData = dataToExport.map((clinic) => {
+      // Handle follow-ups data formatting
+      const followUpDetails = clinic?.followUps?.map(followUp => {
+        return `Date: ${moment(followUp?.followUpDate).format('D MMM YYYY')}, Remarks: ${followUp?.remarks}, URL: ${followUp?.url}`;
+      }).join(" | ");  // Concatenate multiple follow-ups with a separator
+    
+      return {
+        Date: moment(clinic?.createdAt).format('D MMM YYYY'),
+        Doctor_Name: clinic?.doctorName,
+        Doctor_Number: clinic?.doctorNumber,
+        Doctor_Whatsapp_Contacted: clinic?.doctorWhatsAppContacted,
+        Pharmacy_Name: clinic?.pharmacyName,
+        Pharmacy_Number: clinic?.pharmacyNumber,
+        Pharmacy_Whatsapp_Contacted: clinic?.pharmacyWhatsAppContacted,
+        Grade: clinic?.grade,
+        MR_Name: clinic?.createdBy?.name,
+        Remarks: clinic?.remarks,
+        Notes: clinic?.notes,
+        "Follow Up Details": followUpDetails || 'No follow-ups',  // Add formatted follow-up details
+      };
+    });
+    
+    // Export the data
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "DoctorList.xlsx");
+  }    
 
   const handleMRSelect = (mrName) => {
     dispatch(setSelectedMR(mrName));
@@ -123,7 +132,7 @@ const AdminNavbar = () => {
     // Dispatch logout action to update the state
     dispatch(logout());
     // Navigate to login page or wherever necessary
-    navigate("/admin/signin");
+    navigate("/admin");
     toast.success("Signed out Successfully!", { autoClose: 3000 });
   };
 
@@ -260,13 +269,13 @@ const AdminNavbar = () => {
               {isDateRangeSelected ? `${moment(dateRange.startDate).format('DD/MM/YYYY')} - ${moment(dateRange.endDate).format('DD/MM/YYYY')}` : 'Date Range'}
             </button>
             {isDateRangeSelected && (
-            <button
-              onClick={clearDateFilter}
-              className="absolute -right-2 -top-2 bg-red-500 text-white rounded-full p-1"
-            >
-              <X size={12} />
-            </button>
-          )}
+              <button
+                onClick={clearDateFilter}
+                className="absolute -right-2 -top-2 bg-red-500 text-white rounded-full p-1"
+              >
+                <X size={12} />
+              </button>
+            )}
           </div>
 
           <div className="relative">
@@ -384,7 +393,7 @@ const AdminNavbar = () => {
         </div>
       )}
 
-{isDatePickerOpen && (
+      {isDatePickerOpen && (
         <div className="absolute top-full left-0 mt-1 bg-white border rounded shadow-lg z-50 p-4 min-w-[250px]">
           <div className="flex flex-col space-y-2">
             <label className="text-sm font-medium text-gray-700">Start Date:</label>

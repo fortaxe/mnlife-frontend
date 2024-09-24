@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSchedules, setLoading, updateScheduleStatus } from "@/redux/listScheduleSlice";
 import axios from 'axios';
-import moment from "moment";
 import Navbar from "./Navbar";
 import {
   DropdownMenu,
@@ -26,6 +25,7 @@ import { toast } from "react-toastify";
 import ScheduleModal from './ScheduleModal';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import CircularProgress from '@mui/material/CircularProgress';
+import moment from "moment-timezone";
 
 const Appointments = () => {
   const dispatch = useDispatch();
@@ -48,24 +48,32 @@ const Appointments = () => {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       };
 
-      const [todayResponse, upcomingResponse] = await Promise.all([
-        axios.get('https://mnlifescience.vercel.app/api/schedule/today', { headers }),
-        axios.get('https://mnlifescience.vercel.app/api/schedule/upcoming', { headers }),
-      ]);
+      // Fetch today's schedule first
+      const todayResponse = await axios.get('https://mnlifescience.vercel.app/api/schedule/today', { headers });
+      dispatch(setSchedules({
+        todaysSchedule: todayResponse.data.scheduleCalls,
+        upcomingSchedule: [],  // Keep upcoming empty initially
+      }));
 
+      // Fetch upcoming schedule next
+      const upcomingResponse = await axios.get('https://mnlifescience.vercel.app/api/schedule/upcoming', { headers });
       dispatch(setSchedules({
         todaysSchedule: todayResponse.data.scheduleCalls,
         upcomingSchedule: upcomingResponse.data.scheduleCalls,
       }));
+
+      console.log("API response time:", todayResponse);
+
     } catch (error) {
       console.error('Failed to load schedules', error);
     } finally {
       dispatch(setLoading(false));
     }
   };
+
 
   const handleStatusUpdate = async (scheduleCallId, newStatus) => {
     try {
@@ -140,9 +148,28 @@ const Appointments = () => {
     setIsModalOpen(false);
     fetchSchedules();
   };
+  const formatTime = (utcTime) => {
+    const date = new Date(utcTime);
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    return `${hours}:${minutes} ${ampm}`;
+  };
 
-
-
+  const formatDateAndTime = (utcTime) => {
+    const date = new Date(utcTime);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = monthNames[date.getUTCMonth()];
+    const day = date.getUTCDate();
+    const year = date.getUTCFullYear();
+    const time = formatTime(utcTime);
+    return `${month} ${day}, ${year} - ${time}`;
+  };
+  
+  
   return (
     <div>
       <Navbar />
@@ -154,16 +181,16 @@ const Appointments = () => {
             <div key={call.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {call.dcotorName && <p>Dr. {call.dcotorName}</p>}
+                {call.doctorName && <p>Dr. {call.doctorName}</p>}
                   {call.pharmacyName && <p>{call.pharmacyName}</p>}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                  {loadingId === call.scheduleCallId ? (
-            <CircularProgress size={24} />
-          ) : (
-            call.status === "Scheduled" ? "Update Status" : call.status
-          )}
+                    {loadingId === call.scheduleCallId ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      call.status === "Scheduled" ? "Update Status" : call.status
+                    )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
@@ -215,7 +242,7 @@ const Appointments = () => {
               </div>
 
               <div className="flex justify-between items-center">
-                <div>{call.time && <p>{moment(call.time, "HH:mm").format("hh:mm A")}</p>}</div>
+              <p>{formatTime(call.time)}</p>
                 <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
                   Reschedule Call
                 </button>
@@ -236,11 +263,11 @@ const Appointments = () => {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                  {loadingId === call.scheduleCallId ? (
-            <CircularProgress size={24} />
-          ) : (
-            call.status === "Scheduled" ? "Update Status" : call.status
-          )}
+                    {loadingId === call.scheduleCallId ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      call.status === "Scheduled" ? "Update Status" : call.status
+                    )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
@@ -293,13 +320,7 @@ const Appointments = () => {
               </div>
 
               <div className="flex justify-between items-center">
-                <div>
-                  {call.time && call.date && (
-                    <p>
-                      {moment(call.date).format("D MMM YYYY")} - {moment(call.time, "HH:mm").format("hh:mm A")}
-                    </p>
-                  )}
-                </div>
+              <div>{call.time && <p>{formatDateAndTime(call.time)}</p>}</div>
                 <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
                   Reschedule Call
                 </button>

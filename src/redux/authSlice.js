@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    isAdminLoggedIn: false,
-    token: null,
+    isAdminLoggedIn: !!localStorage.getItem("token"), // Check if token exists in localStorage
+    token: localStorage.getItem("token"),
   },
   reducers: {
     setLoginState(state, action) {

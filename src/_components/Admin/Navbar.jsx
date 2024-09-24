@@ -29,7 +29,7 @@ const Navbar = () => {
         // Dispatch logout action to update the state
         dispatch(logout());
         // Navigate to login page or wherever necessary
-        navigate("/admin/signin");
+        navigate("/admin");
         toast.success("Signed out Successfully!", { autoClose: 3000 });
     };
 

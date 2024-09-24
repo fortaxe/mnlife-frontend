@@ -21,6 +21,8 @@ const scheduleSlice = createSlice({
             state.isModalOpen = false;
             state.selectedClinic = null;
             state.selectedType = null;
+            state.selectedDate = null;
+            state.selectedTime = null;
         },
         setDate: (state, action) => {
             state.selectedDate = action.payload;

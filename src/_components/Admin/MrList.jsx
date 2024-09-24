@@ -15,6 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Trash2 } from "lucide-react";
 import { deleteMR } from "@/redux/mrSlice";
 import { useDispatch } from "react-redux";
+import CircularProgress from '@mui/material/CircularProgress';
+import { Button } from "@/components/ui/button";
+
 
 const MrList = () => {
     const dispatch = useDispatch();
@@ -25,6 +28,7 @@ const MrList = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [currentMrId, setCurrentMrId] = useState(null);  // Keep track of MR ID for password change
+    const [loadingStatuses, setLoadingStatuses] = useState({});
 
     useEffect(() => {
         const fetchMrs = async () => {
@@ -37,6 +41,13 @@ const MrList = () => {
                         },
                     });
                     setMrs(response.data);
+
+                     // Initialize loading statuses
+                     const initialLoadingStatuses = response.data.reduce((acc, mr) => {
+                        acc[mr._id] = false;
+                        return acc;
+                    }, {});
+                    setLoadingStatuses(initialLoadingStatuses);
                 } else {
                     console.error("No token found in localStorage");
                 }
@@ -132,6 +143,7 @@ const MrList = () => {
 
 
     const handleUpdateStatus = async (id, status) => {
+        setLoadingStatuses(prev => ({ ...prev, [id]: true }));
         try {
             const token = localStorage.getItem("token");
             await axios.patch(
@@ -139,9 +151,15 @@ const MrList = () => {
                 { id, status },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+             // Update the local state
+             setMrs(prevMrs => prevMrs.map(mr => 
+                mr._id === id ? { ...mr, status } : mr
+            ));
             toast.success("Status updated successfully");
         } catch (error) {
             toast.error(`Error updating status: ${error.response.data}`);
+        }  finally {
+            setLoadingStatuses(prev => ({ ...prev, [id]: false }));
         }
     };
 
@@ -154,8 +172,6 @@ const MrList = () => {
             toast.error(err || "Failed to delete MR");
         }
     };
-    
-
 
     return (
         <div>
@@ -192,8 +208,16 @@ const MrList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger>{mr.status}</DropdownMenuTrigger>
+                                <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button 
+                                                variant="outlined" 
+                                                disabled={loadingStatuses[mr._id]}
+                                                startIcon={loadingStatuses[mr._id] ? <CircularProgress size={20} /> : null}
+                                            >
+                                                {mr.status}
+                                            </Button>
+                                        </DropdownMenuTrigger>
                                         <DropdownMenuContent>
                                             <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'Active')}>Active</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'In-Active')}>In-active</DropdownMenuItem>

@@ -54,7 +54,7 @@ const ChangeCredentials = () => {
       // Handle success
       if (response.status === 200) {
         toast.success("Credentials updated successfully!", { autoClose: 3000 });
-        navigate('/admin/signin');
+        navigate('/admin');
       } else {
         setErrors({ general: "Unexpected response from the server." });
       }

@@ -108,6 +108,19 @@ export const archiveClinic = createAsyncThunk(
   }
 );
 
+// Async thunk for adding a follow-up
+export const addFollowUp = createAsyncThunk(
+  'doctorList/addFollowUp',
+  async ({ clinicId, followUpData }, { rejectWithValue }) => {
+      try {
+          const response = await axios.post(`https://mnlifescience.vercel.app/api/follow-up${clinicId}`, followUpData);
+          return response.data; // Return the response data
+      } catch (error) {
+          return rejectWithValue(error.response ? error.response.data : error.message);
+      }
+  }
+);
+
 export const initialDateRange = {
   startDate: null,
   endDate: null
@@ -199,6 +212,21 @@ const doctorListSlice = createSlice({
         state.filteredClinics = filterClinics(state);
       })
       .addCase(updateClinic.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(addFollowUp.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addFollowUp.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const index = state.clinics.findIndex(clinic => clinic._id === action.payload._id);
+        if (index !== -1) {
+          state.clinics[index] = action.payload; // Update the specific clinic
+        }
+        state.filteredClinics = filterClinics(state);
+      })
+      .addCase(addFollowUp.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

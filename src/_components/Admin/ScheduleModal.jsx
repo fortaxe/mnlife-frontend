@@ -1,58 +1,106 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal, setDate, setTime } from "@/redux/scheduleSlice";
-import Calendar from "react-calendar"; 
-import 'react-calendar/dist/Calendar.css';
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 const ScheduleModal = ({ selectedClinic, selectedType, scheduleCallId, onClose }) => {
     const dispatch = useDispatch();
     const { selectedDate, selectedTime } = useSelector((state) => state.schedule);
+    const [hours, setHours] = useState("");
+    const [minutes, setMinutes] = useState("");
+    const [amPm, setAmPm] = useState("AM");
+
+    useEffect(() => {
+        if (selectedTime) {
+            const date = new Date(selectedTime);
+            setHours(format(date, "hh"));
+            setMinutes(format(date, "mm"));
+            setAmPm(format(date, "a"));
+        }
+    }, [selectedTime]);
 
     const handleDateChange = (date) => {
         dispatch(setDate(date));
     };
 
-    const handleTimeChange = (e) => {
-        dispatch(setTime(e.target.value));
+    const handleTimeChange = (h, m, a) => {
+        if (h === "" || m === "") return;
+        
+        let adjustedHours = parseInt(h);
+        if (a === "PM" && adjustedHours !== 12) {
+            adjustedHours += 12;
+        } else if (a === "AM" && adjustedHours === 12) {
+            adjustedHours = 0;
+        }
+        const newTime = new Date(0, 0, 0, adjustedHours, parseInt(m));
+        dispatch(setTime(newTime));
     };
 
-    // Helper function to convert time to 24-hour format
-    const convertTimeTo24HourFormat = (time12h) => {
-        const [time, modifier] = time12h.split(' ');
-        let [hours, minutes] = time.split(':');
-        if (hours === '12') {
-            hours = '00';
+    const handleHoursChange = (e) => {
+        const value = e.target.value;
+        setHours(value);
+        handleTimeChange(value, minutes, amPm);
+    };
+
+    const handleMinutesChange = (e) => {
+        const value = e.target.value;
+        setMinutes(value);
+        handleTimeChange(hours, value, amPm);
+    };
+
+    const handleAmPmChange = () => {
+        const newAmPm = amPm === "AM" ? "PM" : "AM";
+        setAmPm(newAmPm);
+        handleTimeChange(hours, minutes, newAmPm);
+    };
+
+    const handleCloseModal = () => {
+        dispatch(closeModal());
+        if (onClose) {
+            onClose();
         }
-        if (modifier === 'PM') {
-            hours = parseInt(hours, 10) + 12;
-        }
-        return `${hours}:${minutes}`;
     };
 
     const handleScheduleCall = async () => {
+        if (!selectedDate) {
+            toast.error("Please select a date.");
+            return;
+        }
+        if (!selectedTime) {
+            toast.error("Please select a time.");
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
-    
-            // Convert selected date to correct local time
-            const localDate = new Date(selectedDate);
-            const utcOffset = localDate.getTimezoneOffset() * 60000; 
-            const adjustedDate = new Date(localDate.getTime() - utcOffset);
-    
-            const formattedTime = convertTimeTo24HourFormat(selectedTime);
-    
-            // API URLs for scheduling and rescheduling
+
+            const formattedDate = format(new Date(selectedDate), "yyyy-MM-dd");
+           
+            
+             // Create a new Date object combining the selected date and time
+        const combinedDateTime = new Date(selectedDate);
+        combinedDateTime.setHours(selectedTime.getHours());
+        combinedDateTime.setMinutes(selectedTime.getMinutes());
+
+             const utcTime = new Date(combinedDateTime.getTime() - combinedDateTime.getTimezoneOffset() * 60000);
+
             const apiUrl = scheduleCallId
                 ? `https://mnlifescience.vercel.app/api/schedule/reschedule`
                 : selectedType === "doctor"
                     ? "https://mnlifescience.vercel.app/api/schedule/call/doctor"
                     : "https://mnlifescience.vercel.app/api/schedule/call/pharmacy";
-    
+
             const requestBody = scheduleCallId
-                ? { scheduleCallId, date: adjustedDate, time: formattedTime }
-                : { clinicId: selectedClinic._id, date: adjustedDate, time: formattedTime };
-    
+                ? { scheduleCallId, date: formattedDate, time: utcTime }
+                : { clinicId: selectedClinic._id, date: formattedDate, time: utcTime };
+
+            console.log("API URL:", apiUrl);
+            console.log("Request Body:", requestBody);
+            console.log("Token:", token);
+
             const response = scheduleCallId
                 ? await axios.patch(apiUrl, requestBody, {
                     headers: { Authorization: `Bearer ${token}` }
@@ -60,14 +108,16 @@ const ScheduleModal = ({ selectedClinic, selectedType, scheduleCallId, onClose }
                 : await axios.post(apiUrl, requestBody, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-    
+
+            console.log("Response:", response.data);
             toast.success(`Schedule ${scheduleCallId ? "rescheduled" : "created"} successfully!`);
-            onClose();
+            handleCloseModal();
         } catch (error) {
+            console.error("Error:", error);
             if (error.response && error.response.status === 400) {
                 toast.error("A schedule call already exists for this date and time.");
             } else {
-                console.log("Error scheduling call:", error);
+                console.error("Error scheduling call:", error);
                 toast.error("Error scheduling call. Try again later.");
             }
         }
@@ -79,28 +129,49 @@ const ScheduleModal = ({ selectedClinic, selectedType, scheduleCallId, onClose }
                 <h2 className="text-lg font-bold mb-4">
                     {scheduleCallId ? "Reschedule" : "Schedule"} {selectedType === "doctor" ? "Doctor" : "Pharmacy"} Call
                 </h2>
-                
+
                 <div className="mb-4">
-                    <Calendar onChange={handleDateChange} value={selectedDate} />
-                </div>
-                
-                <div className="mb-4">
-                    <label className="block mb-2">Select Time:</label>
-                    <input
-                        type="time"
-                        value={selectedTime}
-                        onChange={handleTimeChange}
-                        className="border border-gray-300 p-2 rounded"
+                    <label className="block mb-2">Select Date:</label>
+                    <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDateChange}
+                        className="rounded-md border"
                     />
                 </div>
-                
+
+                <div className="mb-4 flex items-center">
+                    <label className="block mr-2">Select Time:</label>
+                    <input
+                        type="text"
+                        value={hours}
+                        onChange={handleHoursChange}
+                        placeholder="HH"
+                        className="border border-gray-300 p-2 rounded mr-2 w-16 text-center"
+                    />
+                    :
+                    <input
+                        type="text"
+                        value={minutes}
+                        onChange={handleMinutesChange}
+                        placeholder="MM"
+                        className="border border-gray-300 p-2 rounded mr-2 w-16 text-center"
+                    />
+                    <button
+                        onClick={handleAmPmChange}
+                        className="bg-gray-200 px-2 py-1 rounded"
+                    >
+                        {amPm}
+                    </button>
+                </div>
+
                 <button
                     onClick={handleScheduleCall}
                     className="bg-blue-500 text-white px-4 py-2 rounded"
                 >
                     {scheduleCallId ? "Reschedule Call" : "Schedule Call"}
                 </button>
-                <button onClick={onClose} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded">
+                <button onClick={handleCloseModal} className="ml-2 bg-gray-500 text-white px-4 py-2 rounded">
                     Close
                 </button>
             </div>
