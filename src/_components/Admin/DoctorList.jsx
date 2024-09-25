@@ -127,22 +127,22 @@ const DoctorList = () => {
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
-                        {filteredClinics && filteredClinics.map((clinic, index) => (
-                            <tr className="odd:bg-gray-50" key={clinic._id} style={{ height: "80px" }}>
+                        {filteredClinics?.map((clinic, index) => (
+                            <tr className="odd:bg-gray-50" key={clinic?._id} style={{ height: "80px" }}>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic._id)} />
+                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.createdAt && moment(clinic.createdAt).format('D MMM YYYY')}
-                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic._id)}>
+                                    {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
+                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
                                         Archive
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
-                                    {clinic.doctorName && clinic.doctorName}
+                                    {clinic?.doctorName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'doctor')}
@@ -151,33 +151,33 @@ const DoctorList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.speciality && clinic.speciality }
+                                    {clinic?.speciality}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FBFAD6]"
-                                        onClick={() => openFollowUpModal(clinic.followUps)}
+                                        onClick={() => openFollowUpModal(clinic?.followUps)}
                                     >
-                                        View Follow-up 
+                                        View Follow-up
                                     </button>
                                 </td>
 
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.doctorNumber && clinic.doctorNumber}
+                                    {clinic?.doctorNumber}
                                     <div className="flex items-center mt-2">
                                         <input
                                             type="checkbox"
-                                            id={`doctor-contacted-${clinic._id}`}
-                                            checked={clinic.doctorWhatsAppContacted}
+                                            id={`doctor-contacted-${clinic?._id}`}
+                                            checked={clinic?.doctorWhatsAppContacted}
                                             readOnly
                                             className="mr-2"
                                         />
-                                        <label htmlFor={`doctor-contacted-${clinic._id}`} className="text-sm">
+                                        <label htmlFor={`doctor-contacted-${clinic?._id}`} className="text-sm">
                                             What's App Contacted
                                         </label>
                                     </div>
                                 </td>
-                                
+
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyName && clinic.pharmacyName}
+                                    {clinic?.pharmacyName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'pharmacy')}
@@ -186,25 +186,25 @@ const DoctorList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyNumber && clinic.pharmacyNumber}
+                                    {clinic?.pharmacyNumber}
                                     <div className="flex items-center mt-2">
                                         <input
                                             type="checkbox"
                                             id={`pharmacy-contacted-${clinic._id}`}
-                                            checked={clinic.pharmacyWhatsAppContacted}
+                                            checked={clinic?.pharmacyWhatsAppContacted}
                                             readOnly
                                             className="mr-2"
                                         />
-                                        <label htmlFor={`pharmacy-contacted-${clinic._id}`} className="text-sm">
+                                        <label htmlFor={`pharmacy-contacted-${clinic?._id}`} className="text-sm">
                                             Pharmacy Contacted
                                         </label>
                                     </div>
                                 </td>
                                 <td
                                     className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
-                                    onClick={() => clinic.url && window.open(clinic.url, "_blank")}
+                                    onClick={() => clinic?.url && window.open(clinic?.url, "_blank")}
                                 >
-                                    {clinic.url && clinic.url.length > 0 ? "Location" : "No Location"}
+                                    {clinic?.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
 
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
@@ -219,15 +219,15 @@ const DoctorList = () => {
                                         </DropdownMenuContent>
                                     </DropdownMenu> */}
 
-                                    {clinic.grade && clinic.grade}
+                                    {clinic?.grade}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.createdBy && clinic.createdBy.name }
+                                    {clinic?.createdBy?.name}
                                 </td>
 
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic.remarks && clinic.remarks}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic?.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
-                                    <Input className="w-[300px] h-[50px]" value={clinic.notes && clinic.notes} readOnly />
+                                    <Input className="w-[300px] h-[50px]" value={clinic?.notes} readOnly />
                                 </td>
                             </tr>
                         ))}
@@ -247,16 +247,16 @@ const DoctorList = () => {
                         clinic={selectedClinic}
                         onClose={() => setIsEditModalOpen(false)}
                         onUpdate={handleUpdateClinic}
-                        isLoading={loadingClinicId === selectedClinic._id}
+                        isLoading={loadingClinicId === selectedClinic?._id}
                     />
                 )}
 
                 {isFollowUpModalOpen && (
-                     <FollowUpModal
-                     isOpen={isFollowUpModalOpen}
-                     onClose={closeFollowUpModal}
-                     followUps={selectedFollowUps}
-                 />
+                    <FollowUpModal
+                        isOpen={isFollowUpModalOpen}
+                        onClose={closeFollowUpModal}
+                        followUps={selectedFollowUps}
+                    />
                 )}
             </div>
         </div>

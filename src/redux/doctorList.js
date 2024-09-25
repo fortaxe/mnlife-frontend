@@ -16,9 +16,9 @@ export const fetchClinics = createAsyncThunk(
             },
           }
         );
-        console.log(response.data);
+        
         return response.data;
-
+        console.log(response.data);
       } else {
         return rejectWithValue("No token found in localStorage");
       }

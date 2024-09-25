@@ -161,15 +161,15 @@ const Appointments = () => {
   const formatDateAndTime = (utcTime) => {
     const date = new Date(utcTime);
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const month = monthNames[date.getUTCMonth()];
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
     const time = formatTime(utcTime);
     return `${month} ${day}, ${year} - ${time}`;
   };
-  
-  
+
+
   return (
     <div>
       <Navbar />
@@ -177,26 +177,26 @@ const Appointments = () => {
         {/* Today's Schedule */}
         <h2 className="font-bold text-[18px] ml-4 text-[#386D62]">Today's Call Schedule</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {todaysSchedule.map((call) => (
-            <div key={call.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
+          {todaysSchedule?.map((call) => (
+            <div key={call?.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                {call.doctorName && <p>Dr. {call.doctorName}</p>}
-                  {call.pharmacyName && <p>{call.pharmacyName}</p>}
+                  {<p>Dr. {call?.doctorName}</p>}
+                  {<p>{call?.pharmacyName}</p>}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                    {loadingId === call.scheduleCallId ? (
+                    {loadingId === call?.scheduleCallId ? (
                       <CircularProgress size={24} />
                     ) : (
-                      call.status === "Scheduled" ? "Update Status" : call.status
+                      call?.status === "Scheduled" ? "Update Status" : call?.status
                     )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call?.scheduleCallId, "Call Done")}>
                       Call Done
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call?.scheduleCallId, "Cancelled")}>
                       Cancelled
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -205,16 +205,16 @@ const Appointments = () => {
 
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {call.doctorNumber && <p>{call.doctorNumber}</p>}
-                  {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
+                  {<p>{call?.doctorNumber}</p>}
+                  {<p>{call?.pharmacyNumber}</p>}
                 </div>
                 <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
                   <DialogTrigger asChild>
                     <Button
                       className="px-4 py-2 bg-[#FFD9BD] rounded text-black hover:bg-[#FFD9BD]"
                       onClick={() => {
-                        setNotes(call.notes || "");
-                        setSelectedScheduleId(call.scheduleCallId);
+                        setNotes(call?.notes || "");
+                        setSelectedScheduleId(call?.scheduleCallId);
                         setIsEditing(true);
                       }}
                     >
@@ -242,8 +242,8 @@ const Appointments = () => {
               </div>
 
               <div className="flex justify-between items-center">
-              <p>{formatTime(call.time)}</p>
-                <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
+                <p>{formatTime(call?.time)}</p>
+                <button onClick={() => handleRescheduleClick(call?.scheduleCallId)} className=" py-2 text-blue-700 rounded">
                   Reschedule Call
                 </button>
               </div>
@@ -254,26 +254,26 @@ const Appointments = () => {
         {/* Upcoming Schedule */}
         <h2 className="font-bold text-[18px] text-[#386D62]">Upcoming Call Schedule</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {upcomingSchedule.map((call) => (
-            <div key={call.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
+          {upcomingSchedule?.map((call) => (
+            <div key={call?.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {call.doctorName && <p>Dr. {call.doctorName}</p>}
-                  {call.pharmacyName && <p>{call.pharmacyName}</p>}
+                  {<p>Dr.{call?.doctorName}</p>}
+                  {<p>{call?.pharmacyName}</p>}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="px-4 py-2 bg-[#E2FFBD] text-black rounded">
-                    {loadingId === call.scheduleCallId ? (
+                    {loadingId === call?.scheduleCallId ? (
                       <CircularProgress size={24} />
                     ) : (
-                      call.status === "Scheduled" ? "Update Status" : call.status
+                      call?.status === "Scheduled" ? "Update Status" : call?.status
                     )}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Call Done")}>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call?.scheduleCallId, "Call Done")}>
                       Call Done
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusUpdate(call.scheduleCallId, "Cancelled")}>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(call?.scheduleCallId, "Cancelled")}>
                       Cancelled
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -282,8 +282,8 @@ const Appointments = () => {
 
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {call.doctorNumber && <p>{call.doctorNumber}</p>}
-                  {call.pharmacyNumber && <p>{call.pharmacyNumber}</p>}
+                  {<p>{call?.doctorNumber}</p>}
+                  {<p>{call?.pharmacyNumber}</p>}
                 </div>
 
                 <Dialog onOpenChange={(open) => !open && setIsEditing(false)} open={isEditing}>
@@ -291,7 +291,7 @@ const Appointments = () => {
                     <Button
                       className="px-4 py-2 bg-[#FFD9BD] rounded text-black hover:bg-[#FFD9BD]"
                       onClick={() => {
-                        setNotes(call.notes || "");
+                        setNotes(call?.notes || "");
                         setSelectedScheduleId(call.scheduleCallId);
                         setIsEditing(true);
                       }}
@@ -320,8 +320,8 @@ const Appointments = () => {
               </div>
 
               <div className="flex justify-between items-center">
-              <div>{call.time && <p>{formatDateAndTime(call.time)}</p>}</div>
-                <button onClick={() => handleRescheduleClick(call.scheduleCallId)} className=" py-2 text-blue-700 rounded">
+                <div>{call?.time && <p>{formatDateAndTime(call?.time)}</p>}</div>
+                <button onClick={() => handleRescheduleClick(call?.scheduleCallId)} className=" py-2 text-blue-700 rounded">
                   Reschedule Call
                 </button>
               </div>

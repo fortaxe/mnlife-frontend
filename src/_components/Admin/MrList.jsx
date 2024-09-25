@@ -192,13 +192,13 @@ const MrList = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                        {mrs.map((mr, index) => (
+                        {mrs?.map((mr, index) => (
                             <tr className="odd:bg-gray-50" key={index}>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700"><Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteMR(mr._id)} /></td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{moment(mr.joiningDate).format('D MMM YYYY')}</td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.name}</td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.mobileNumber}</td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr.areaName}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{moment(mr?.joiningDate).format('D MMM YYYY')}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr?.name}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr?.mobileNumber}</td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr?.areaName}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <button
                                         onClick={() => openPasswordModal(mr._id)}
@@ -212,28 +212,28 @@ const MrList = () => {
                                         <DropdownMenuTrigger asChild>
                                             <Button 
                                                 variant="outlined" 
-                                                disabled={loadingStatuses[mr._id]}
-                                                startIcon={loadingStatuses[mr._id] ? <CircularProgress size={20} /> : null}
+                                                disabled={loadingStatuses[mr?._id]}
+                                                startIcon={loadingStatuses[mr?._id] ? <CircularProgress size={20} /> : null}
                                             >
                                                 {mr.status}
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'Active')}>Active</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr._id, 'In-Active')}>In-active</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr?._id, 'Active')}>Active</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleUpdateStatus(mr?._id, 'In-Active')}>In-active</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr.aadhaarCard })}>
-                                    {mr.aadhaarCard ? (
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr?.aadhaarCard })}>
+                                    {mr?.aadhaarCard ? (
                                         <span>View Aadhaar</span>
                                     ) : (
                                         <span className="text-red-500">No Aadhaar Card provided</span>
                                     )}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                    {mr.panCard ? (
-                                        <span onClick={() => openModal({ type: 'PAN', url: mr.panCard })}>View PAN</span>
+                                    {mr?.panCard ? (
+                                        <span onClick={() => openModal({ type: 'PAN', url: mr?.panCard })}>View PAN</span>
                                     ) : (
                                         <span className="text-red-500">No Pan Card provided</span>
                                     )}

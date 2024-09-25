@@ -20,7 +20,7 @@ const CalledList = () => {
           }
         );
         setCompletedCalls(response.data.completedCalls);
-        console.log(completedCalls)
+        console.log("completed calls", response.data);
       } catch (error) {
         console.error("Error fetching completed schedule calls:", error);
       }
@@ -48,11 +48,16 @@ const CalledList = () => {
           <tbody className="divide-y divide-gray-200">
             {completedCalls.map((call, index) => (
               <tr key={index} className="odd:bg-gray-50">
-                <td className="p-2 text-gray-700">{moment(call.lastCalledDate).format('D MMM YYYY')}</td>
-                <td className="p-2 text-gray-700">{call.clinic.doctorName}</td>
-                <td className="p-2 text-gray-700">{call.clinic.doctorNumber}</td>
-                <td className="p-2 text-gray-700">{call.clinic.pharmacyName}</td>
-                <td className="p-2 text-gray-700">{call.clinic.pharmacyNumber}</td>
+                 {/* <td className="p-2 text-gray-700">{moment(call.lastCalledDate).format('D MMM YYYY')}</td> */}
+                <td className="p-2 text-gray-700">{call?.updatedAt ? moment(call.updatedAt).format('D MMM YYYY') : ''} </td>
+                <td className="p-2 text-gray-700">{call?.clinic?.doctorName || ''}</td>
+                <td className="p-2 text-gray-700">
+                  {call?.clinic?.doctorNumber || ''}
+                </td>
+                <td className="p-2 text-gray-700">
+                {call?.clinic?.pharmacyName || ''}
+                </td>
+                <td className="p-2 text-gray-700">{call?.clinic?.pharmacyNumber || ''}</td>
               </tr>
             ))}
           </tbody>
