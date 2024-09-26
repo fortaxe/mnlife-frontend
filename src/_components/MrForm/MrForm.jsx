@@ -91,11 +91,11 @@ const MrForm = () => {
             } else if (error.request) {
                 console.error("No response received:", error.request);
                 setErrors({ general: "No response received from server. Please try again." });
-                toast.error("No response received from server. Please try again.");
+                toast.error("Failed to create MR. Please try again.");
             } else {
                 console.error("Error message:", error.message);
                 setErrors({ general: "An unexpected error occurred. Please try again." });
-                toast.error("An unexpected error occurred. Please try again.");
+                toast.error("Failed to create MR. Please try again.");
             }
         } finally {
             setSubmitting(false);
@@ -109,7 +109,7 @@ const MrForm = () => {
         const file = event.target.files[0];
         if (file) {
             if (!allowedFileTypes.includes(file.type)) {
-                setError("Invalid file format. Only jpg and png are allowed.");
+                setError("Invalid file format. Only jpeg and png are allowed.");
                 setFile(null);
             } else {
                 setError(""); // Clear error if valid
