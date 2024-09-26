@@ -95,7 +95,7 @@ const ArchiveList = () => {
 
                     <tbody className="divide-y divide-gray-200">
                         {archivedClinics?.map((clinic, index) => (
-                            <tr className="odd:bg-gray-50" key={index} style={{ height: "80px" }}>
+                            <tr className="odd:bg-gray-50" key={clinic?._id} style={{ height: "80px" }}>
                                
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
