@@ -8,7 +8,7 @@ import MapPopup from "../Mapbox/MapboxMap";
 import { Input } from "@/components/ui/input";
 import EditClinicModal from "./EditClinicModal";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArchivedClinics, unArchiveClinic } from "@/redux/archiveList";
+import { fetchArchivedClinics, unArchiveClinic, deleteArchivedClinic } from "@/redux/archiveList";
 import 'react-toastify/dist/ReactToastify.css';
 import { deleteClinic } from "@/redux/doctorList";
 import Navbar from "./Navbar";
@@ -56,7 +56,7 @@ const ArchiveList = () => {
 
     const handleDeleteClinic = async (id) => {
         try {
-            await dispatch(deleteClinic({ id }));
+            await dispatch(deleteArchivedClinic(id)).unwrap();
             toast.success("Clinic deleted successfully");
         } catch (err) {
             toast.error(err || "Failed to delete clinic");

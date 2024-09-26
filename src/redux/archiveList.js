@@ -27,6 +27,31 @@ export const fetchArchivedClinics = createAsyncThunk(
     }
   );
 
+  export const deleteArchivedClinic = createAsyncThunk(
+    "archiveList/deleteArchivedClinic",
+    async (id, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          await axios.delete(
+            "https://mnlifescience.vercel.app/api/admin/delete-clinic",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              data: { id }
+            }
+          );
+          return id;
+        } else {
+          return rejectWithValue("No token found in localStorage");
+        }
+      } catch (error) {
+        return rejectWithValue(error.message || "An error occurred while deleting the archived clinic");
+      }
+    }
+  );
+
   export const unArchiveClinic = createAsyncThunk(
     "doctorList/unArchiveClinic",
     async ({ clinicId }, { rejectWithValue, getState }) => {
@@ -89,8 +114,18 @@ const archiveListSlice = createSlice({
       .addCase(unArchiveClinic.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
+      })
+      .addCase(deleteArchivedClinic.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deleteArchivedClinic.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.archivedClinics = state.archivedClinics.filter(clinic => clinic._id !== action.payload);
+      })
+      .addCase(deleteArchivedClinic.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
-    
   },
 });
 
