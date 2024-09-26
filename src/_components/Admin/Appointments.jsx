@@ -181,7 +181,7 @@ const Appointments = () => {
             <div key={call?.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {<p>Dr. {call?.doctorName}</p>}
+                  {<p>{call?.doctorName}</p>}
                   {<p>{call?.pharmacyName}</p>}
                 </div>
                 <DropdownMenu>
@@ -258,7 +258,7 @@ const Appointments = () => {
             <div key={call?.scheduleCallId} className="bg-[#EEEEEE] shadow rounded-lg p-4">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  {<p>Dr.{call?.doctorName}</p>}
+                  {<p>{call?.doctorName}</p>}
                   {<p>{call?.pharmacyName}</p>}
                 </div>
                 <DropdownMenu>
