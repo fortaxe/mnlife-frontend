@@ -37,6 +37,16 @@ const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Validate doctorNumber and pharmacyNumber
+        if (formData.doctorNumber.length !== 10) {
+            toast.error("Doctor number must be exactly 10 digits");
+            return;
+        }
+        if (formData.pharmacyNumber.length !== 10) {
+            toast.error("Pharmacy number must be exactly 10 digits");
+            return;
+        }
+        
         onUpdate(formData); // Pass the updated data back to DoctorList
     };
 

@@ -27,8 +27,8 @@ const MrForm = () => {
     const validationSchema = Yup.object({
         name: Yup.string().required("Full Name is Required"),
         mobileNumber: Yup.string()
-        .length(10, "Mobile Number must be exactly 10 digits")
-        .required("Mobile Number is Required"),      
+            .length(10, "Mobile Number must be exactly 10 digits")
+            .required("Mobile Number is Required"),
         password: Yup.string().required("Required"),
         confirmPassword: Yup.string()
             .oneOf([Yup.ref("password"), null], "Passwords must match")
@@ -76,23 +76,31 @@ const MrForm = () => {
             setAadhaarCard(null);
             setPanCard(null);
         } catch (error) {
-    console.error("Error creating MR:", error);
-    if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-    } else if (error.request) {
-        // The request was made but no response was received
-        console.error("No response received:", error.request);
-    } else  {
-        // Something happened in setting up the request that triggered an Error
-        console.error("Error message:", error.message);
-    }
-    setErrors({ general: "Failed to create MR. Please try again." });
-}
-    }
+            console.error("Error creating MR:", error);
+            console.error("Error creating MR:", error);
+            if (error.response) {
+                if (error.response.status === 400) {
+                    setErrors({ general: "MR already exists. Please use a different mobile number." });
+                    toast.error("MR already exists. Please use a different mobile number.");
+                } else {
+                    setErrors({ general: `Failed to create MR. ${error.response.data.message || 'Please try again.'}` });
+                    toast.error(`Failed to create MR. ${error.response.data.message || 'Please try again.'}`);
+                }
+                console.error("Response data:", error.response.data);
+                console.error("Response status:", error.response.status);
+            } else if (error.request) {
+                console.error("No response received:", error.request);
+                setErrors({ general: "No response received from server. Please try again." });
+                toast.error("No response received from server. Please try again.");
+            } else {
+                console.error("Error message:", error.message);
+                setErrors({ general: "An unexpected error occurred. Please try again." });
+                toast.error("An unexpected error occurred. Please try again.");
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    };
     // const handleFileSelect = (event, setFile) => {
     //     setFile(event.target.files[0]);
     // };
@@ -116,7 +124,7 @@ const MrForm = () => {
 
             <div className="h-screen flex justify-center md:justify-start mt-14">
                 <div className="w-full max-w-4xl p-8 bg-white rounded-md md:ml-16">
-                <h2 className="text-2xl font-bold mb-6 text-[#386D62] text-left">Add New MR</h2>
+                    <h2 className="text-2xl font-bold mb-6 text-[#386D62] text-left">Add New MR</h2>
 
                     <Formik
                         initialValues={initialValues}
@@ -138,7 +146,7 @@ const MrForm = () => {
                                             name="name"
                                             type="text"
                                             className="w-full border-2 border-[#888888] bg-[#F2F2F2] rounded h-[51px]"
-                                            
+
                                         />
                                         <ErrorMessage
                                             name="name"
@@ -199,7 +207,7 @@ const MrForm = () => {
                                             className="w-full border-2 border-[#888888] bg-[#F2F2F2] rounded h-[51px]"
                                         />
                                         <ErrorMessage
-                                            name="confirmPassword border-2 border-[#888888] bg-[#F2F2F2] rounded h-[51px]"
+                                            name="confirmPassword"
                                             component="div"
                                             className="text-red-500 text-sm mt-1"
                                         />
@@ -269,26 +277,26 @@ const MrForm = () => {
                                     </div>
 
                                     <div>
-                                    <span
-                                        className="text-blue-800 cursor-pointer"
-                                        onClick={() => document.getElementById("panCard").click()}
-                                    >
-                                        Upload PAN Card
-                                    </span>
-                                    <input
-                                        id="panCard"
-                                        type="file"
-                                        className="hidden"
-                                        onChange={(event) => handleFileSelect(event, setPanCard, setPanError)}
-                                    />
-                                    {panCard && (
-                                        <span className="text-green-600 ml-2">PAN selected</span>
-                                    )}
-                                    {panError && (
-                                        <div className="text-red-500 text-sm mt-1">{panError}</div>
-                                    )}
+                                        <span
+                                            className="text-blue-800 cursor-pointer"
+                                            onClick={() => document.getElementById("panCard").click()}
+                                        >
+                                            Upload PAN Card
+                                        </span>
+                                        <input
+                                            id="panCard"
+                                            type="file"
+                                            className="hidden"
+                                            onChange={(event) => handleFileSelect(event, setPanCard, setPanError)}
+                                        />
+                                        {panCard && (
+                                            <span className="text-green-600 ml-2">PAN selected</span>
+                                        )}
+                                        {panError && (
+                                            <div className="text-red-500 text-sm mt-1">{panError}</div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
                                 {errors.general && (
                                     <div className="text-red-500 text-sm mb-4">{errors.general}</div>
