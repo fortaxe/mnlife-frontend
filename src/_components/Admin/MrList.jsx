@@ -243,7 +243,7 @@ const MrList = () => {
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="text-left">
                         <tr>
-                            <th className="p-2 font-medium text-gray-900">Delete</th>
+                            <th className="p-2 font-medium text-gray-900">Archive</th>
                             <th className="p-2 font-medium text-gray-900">MR Create Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Number</th>
@@ -257,7 +257,9 @@ const MrList = () => {
                     <tbody className="divide-y divide-gray-200">
                         {mrs?.map((mr, index) => (
                             <tr className="odd:bg-gray-50" key={index}>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700"><Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteMR(mr._id)} /></td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleDeleteMR(mr._id)}>Archive</button>
+                                </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{moment(mr?.joiningDate).format('D MMM YYYY')}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr?.name}</td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">{mr?.mobileNumber}</td>

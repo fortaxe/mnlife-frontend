@@ -69,6 +69,59 @@ export const deleteMR = createAsyncThunk(
   }
 );
 
+export const fetchArchivedMrs = createAsyncThunk(
+  "doctorList/fetchArchivedMrs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          "https://mnlifescience.vercel.app/api/get-archived-mrs",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
+      } else {
+        return rejectWithValue("No token found in localStorage");
+      }
+    } catch (error) {
+      console.log("unarchived", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const unarchieveMr = createAsyncThunk(
+  "doctorList/unarchieveMR",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.post(
+          "https://mnlifescience.vercel.app/api/admin/unarchive-mr",
+          {
+            id // MR ID to be deleted
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Attach the token in the header
+            }
+          }
+        );
+        console.log(response);
+        return id;
+      } else {
+        return rejectWithValue("No token found in localStorage");
+      }
+    } catch (error) {
+      return rejectWithValue(error.message || "An error occurred while deleting the MR");
+    }
+  }
+);
+
   
 
 // Create the slice
@@ -112,7 +165,30 @@ const mrSlice = createSlice({
               state.loading = false;
              
               state.error = action.payload;
-          });
+          })
+          .addCase(unarchieveMr.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(unarchieveMr.fulfilled, (state, action) => {
+            state.loading = false;
+            state.mrs = state.mrs.filter((mr) => mr._id !== action.payload._id);
+        })
+        .addCase(unarchieveMr.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        })
+        .addCase(fetchArchivedMrs.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchArchivedMrs.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.archivedClinics = action.payload;
+        })
+        .addCase(fetchArchivedMrs.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
     },
 });
 

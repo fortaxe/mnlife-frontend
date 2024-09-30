@@ -17,7 +17,10 @@ const FollowUpModal = ({ isOpen, onClose, followUps }) => {
                             <table className="min-w-full table-auto border-collapse">
                                 <thead>
                                     <tr className="bg-gray-100">
+
+                                    
                                         <th className="border px-4 py-2 text-left">Followed-Up Date</th>
+                                        <th className="border px-4 py-2 text-left">Followed-Up Time</th>
                                         <th className="border px-4 py-2 text-left">Followed-Up Location</th>
                                         <th className="border px-4 py-2 text-left">Remarks</th>
                                     </tr>
@@ -25,8 +28,12 @@ const FollowUpModal = ({ isOpen, onClose, followUps }) => {
                                 <tbody>
                                     {followUps.map((followUp, index) => (
                                         <tr key={followUp._id} className="border-b">
+                                            
                                             <td className="border px-4 py-2 text-sm text-gray-600">
                                                 {moment(followUp.followUpDate).format('D MMM YYYY')}
+                                            </td>
+                                             <td className="border px-4 py-2 text-sm text-gray-600">
+                                                {moment(followUp.followUpDate).format('hh:mm A')}
                                             </td>
                                             <td className="border px-4 py-2 text-sm text-gray-600">
                                                 <a
