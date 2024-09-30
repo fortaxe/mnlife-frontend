@@ -6,7 +6,40 @@ const initialState = {
     mrs: [],
     loading: false,
     error: null,
+   
 };
+
+export const uploadCard = createAsyncThunk(
+  "doctorList/uploadCard",
+  async ({ mrId, cardType, file }, { rejectWithValue }) => {
+      try {
+          const token = localStorage.getItem("token");
+          if (token) {
+              const formData = new FormData();
+              formData.append(cardType, file);
+              formData.append("mrId", mrId); // Add MR ID to the form data
+
+              const endpoint = cardType === "aadhaarCard"
+                  ? "https://mnlifescience.vercel.app/api/admin/update-aadhaar"
+                  : "https://mnlifescience.vercel.app/api/admin/update-pan";
+
+              const response = await axios.patch(endpoint, formData, {
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "multipart/form-data",
+                  },
+              });
+
+              return { mrId, cardType, updatedMR: response.data.updatedMR };
+          } else {
+              return rejectWithValue("No token found in localStorage");
+          }
+      } catch (error) {
+          return rejectWithValue(error.message || "An error occurred while uploading the file");
+      }
+  }
+);
+
 
 export const deleteMR = createAsyncThunk(
   "doctorList/deleteMR",
@@ -60,7 +93,26 @@ const mrSlice = createSlice({
             .addCase(deleteMR.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-            });
+            })
+            .addCase(uploadCard.pending, (state) => {
+              state.loading = true;
+              
+              state.error = null;
+          })
+          .addCase(uploadCard.fulfilled, (state, action) => {
+              state.loading = false;
+              
+              state.mrs = state.mrs.map(mr =>
+                mr._id === action.payload.mrId
+                ? action.payload.updatedMR
+                : mr
+              );
+          })
+          .addCase(uploadCard.rejected, (state, action) => {
+              state.loading = false;
+             
+              state.error = action.payload;
+          });
     },
 });
 

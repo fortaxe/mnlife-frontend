@@ -18,6 +18,7 @@ import { fetchClinics, deleteClinic, archiveClinic, updateClinic } from "@/redux
 import 'react-toastify/dist/ReactToastify.css';
 import LocationModal from "./LocationModal";
 import FollowUpModal from "./FollowupModal";
+import LoadingAnimation from "./LoadingAnimation";
 
 const DoctorList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

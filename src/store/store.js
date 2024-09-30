@@ -7,7 +7,6 @@ import scheduleReducer from "../redux/scheduleSlice";
 import listScheduleSlice from "../redux/listScheduleSlice";
 import doctorListSlice from "@/redux/doctorList";
 import archiveListReducer from "@/redux/archiveList";
-import mrSliceReducer from "@/redux/mrSlice";
 import mrSlice from "@/redux/mrSlice";
 
 const store = configureStore({
@@ -19,7 +18,7 @@ const store = configureStore({
     listSchedule: listScheduleSlice,
     doctorList: doctorListSlice,
     archiveList: archiveListReducer,
-    mrSliceReducer: mrSlice
+    mr: mrSlice
   },
 });
 

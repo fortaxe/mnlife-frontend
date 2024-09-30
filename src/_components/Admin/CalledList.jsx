@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
 import moment from "moment";
+import { set } from "date-fns";
+import LoadingAnimation from "./LoadingAnimation";
 
 
 const CalledList = () => {
   const [completedCalls, setCompletedCalls] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCompletedCalls = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
@@ -23,12 +27,21 @@ const CalledList = () => {
         console.log("completed calls", response.data);
       } catch (error) {
         console.error("Error fetching completed schedule calls:", error);
+      }  finally {
+        setLoading(false); // Stop loading after the data is fetched or error occurs
       }
     };
 
     fetchCompletedCalls();
   }, []);
 
+  if (loading) {  
+    return <div>
+      <Navbar />
+      <LoadingAnimation />
+    </div>;
+  }
+  
   return (
     <div>
       <Navbar />

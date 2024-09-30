@@ -12,6 +12,7 @@ import { fetchArchivedClinics, unArchiveClinic, deleteArchivedClinic } from "@/r
 import 'react-toastify/dist/ReactToastify.css';
 import { deleteClinic } from "@/redux/doctorList";
 import Navbar from "./Navbar";
+import LoadingAnimation from "./LoadingAnimation";
 
 const ArchiveList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,16 +23,12 @@ const ArchiveList = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const dispatch = useDispatch();
-    const { archivedClinics } = useSelector((state) => state.archiveList);
+    const { archivedClinics, status } = useSelector((state) => state.archiveList);
 
     useEffect(() => {
         dispatch(fetchArchivedClinics());
         console.log(fetchArchivedClinics)
     }, [dispatch]);
-
-    if (status === "loading") {
-        return <div>Loading...</div>;
-    }
 
     const openScheduleModal = (clinic, type) => {
         setSelectedClinic(clinic);
@@ -96,7 +93,7 @@ const ArchiveList = () => {
                     <tbody className="divide-y divide-gray-200">
                         {archivedClinics?.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={clinic?._id} style={{ height: "80px" }}>
-                               
+
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
                                 </td>
@@ -117,7 +114,7 @@ const ArchiveList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.doctorNumber}
-                                    
+
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.pharmacyName}
@@ -130,13 +127,13 @@ const ArchiveList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic.pharmacyNumber}
-                                    
+
                                 </td>
                                 <td
                                     className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
                                     onClick={() => clinic?.url && window.open(clinic?.url, "_blank")}
                                 >
-                                   {clinic?.url && clinic.url.length > 0 ? "Location" : "No Location"}
+                                    {clinic?.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.grade}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import moment from "moment";
 import { Dialog, Transition } from '@headlessui/react';
@@ -12,14 +12,16 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
-import { deleteMR } from "@/redux/mrSlice";
+import { Trash2, Upload } from "lucide-react";
+import { deleteMR, uploadCard } from "@/redux/mrSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from '@mui/material/CircularProgress';
 import { Button } from "@/components/ui/button";
+import LoadingAnimation from "./LoadingAnimation";
 
 
 const MrList = () => {
+    const [uploadingStatus, setUploadingStatus] = useState({});
     const dispatch = useDispatch();
     const [mrs, setMrs] = useState([]);
     const [selectedDoc, setSelectedDoc] = useState(null);
@@ -29,9 +31,14 @@ const MrList = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [currentMrId, setCurrentMrId] = useState(null);  // Keep track of MR ID for password change
     const [loadingStatuses, setLoadingStatuses] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const aadhaarFileInputRef = useRef(null);
+    const panFileInputRef = useRef(null);
 
     useEffect(() => {
         const fetchMrs = async () => {
+            setLoading(true);
             try {
                 const token = localStorage.getItem("token");
                 if (token) {
@@ -42,8 +49,8 @@ const MrList = () => {
                     });
                     setMrs(response.data);
 
-                     // Initialize loading statuses
-                     const initialLoadingStatuses = response.data.reduce((acc, mr) => {
+                    // Initialize loading statuses
+                    const initialLoadingStatuses = response.data.reduce((acc, mr) => {
                         acc[mr._id] = false;
                         return acc;
                     }, {});
@@ -53,11 +60,13 @@ const MrList = () => {
                 }
             } catch (error) {
                 console.error("Error fetching MRs:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchMrs();
-    }, []);
+    }, [dispatch]);
 
 
     const openModal = (doc) => {
@@ -151,14 +160,14 @@ const MrList = () => {
                 { id, status },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-             // Update the local state
-             setMrs(prevMrs => prevMrs.map(mr => 
+            // Update the local state
+            setMrs(prevMrs => prevMrs.map(mr =>
                 mr._id === id ? { ...mr, status } : mr
             ));
             toast.success("Status updated successfully");
         } catch (error) {
             toast.error(`Error updating status: ${error.response.data}`);
-        }  finally {
+        } finally {
             setLoadingStatuses(prev => ({ ...prev, [id]: false }));
         }
     };
@@ -173,6 +182,60 @@ const MrList = () => {
         }
     };
 
+    const handleFileUpload = async (mrId, event, cardType) => {
+        const file = event.target.files[0];
+        if (!file) {
+            console.log("No file selected");
+            return;
+        }
+
+        // Start loader for the specific MR and card type
+        setUploadingStatus(prev => ({
+            ...prev,
+            [mrId]: { ...prev[mrId], [cardType]: true }
+        }));
+
+        try {
+            const resultAction = await dispatch(uploadCard({ mrId, cardType, file }));
+            if (uploadCard.fulfilled.match(resultAction)) {
+                const updatedMR = resultAction.payload.updatedMR;
+                setMrs(prevMrs => prevMrs.map(mr =>
+                    mr._id === mrId ? updatedMR : mr
+                ));
+                toast.success(`${cardType === 'aadhaarCard' ? 'Aadhaar' : 'PAN'} card uploaded successfully`);
+
+                // Immediately open the modal to show the uploaded card
+                openModal({ type: cardType === 'aadhaarCard' ? 'Aadhaar' : 'PAN', url: updatedMR[cardType] });
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            toast.error(`Failed to upload ${cardType === 'aadhaarCard' ? 'Aadhaar' : 'PAN'} card`);
+            console.error(`Error uploading ${cardType === 'aadhaarCard' ? 'Aadhaar' : 'PAN'} card:`, error);
+        } finally {
+            // Stop loader for the specific MR and card type
+            setUploadingStatus(prev => ({
+                ...prev,
+                [mrId]: { ...prev[mrId], [cardType]: false }
+            }));
+        }
+    };
+
+
+    const triggerFileInput = (mrId, cardType) => {
+        console.log("Triggering file input for MR ID:", mrId, "Card Type:", cardType);
+        setCurrentMrId(mrId);
+        if (cardType === 'aadhaarCard') {
+            console.log("Opening Aadhaar file input");
+            aadhaarFileInputRef.current.click();
+        } else {
+            console.log("Opening PAN file input");
+            panFileInputRef.current.click();
+        }
+    };
+
+
+
     return (
         <div>
             <Navbar />
@@ -180,7 +243,7 @@ const MrList = () => {
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="text-left">
                         <tr>
-                        <th className="p-2 font-medium text-gray-900">Delete</th>
+                            <th className="p-2 font-medium text-gray-900">Delete</th>
                             <th className="p-2 font-medium text-gray-900">MR Create Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Number</th>
@@ -208,10 +271,10 @@ const MrList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                <DropdownMenu>
+                                    <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button 
-                                                variant="outlined" 
+                                            <Button
+                                                variant="outlined"
                                                 disabled={loadingStatuses[mr?._id]}
                                                 startIcon={loadingStatuses[mr?._id] ? <CircularProgress size={20} /> : null}
                                             >
@@ -224,25 +287,52 @@ const MrList = () => {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer" onClick={() => openModal({ type: 'Aadhaar', url: mr?.aadhaarCard })}>
-                                    {mr?.aadhaarCard ? (
-                                        <span>View Aadhaar</span>
+                                <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
+                                    {uploadingStatus[mr._id]?.aadhaarCard ? (
+                                        <CircularProgress size={20} />
+                                    ) : mr?.aadhaarCard ? (
+                                        <span onClick={() => openModal({ type: 'Aadhaar', url: mr?.aadhaarCard })}>View Aadhaar</span>
                                     ) : (
-                                        <span className="text-red-500">No Aadhaar Card provided</span>
+                                        <button onClick={() => triggerFileInput(mr._id, 'aadhaarCard')} className="flex items-center">
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            Upload Aadhaar
+                                        </button>
                                     )}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer">
-                                    {mr?.panCard ? (
+                                    {uploadingStatus[mr._id]?.panCard ? (
+                                        <CircularProgress size={20} />
+                                    ) : mr?.panCard ? (
                                         <span onClick={() => openModal({ type: 'PAN', url: mr?.panCard })}>View PAN</span>
                                     ) : (
-                                        <span className="text-red-500">No Pan Card provided</span>
+                                        <button onClick={() => triggerFileInput(mr._id, 'panCard')} className="flex items-center">
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            Upload PAN
+                                        </button>
                                     )}
                                 </td>
+
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {/* Hidden file inputs */}
+            <input
+                type="file"
+                ref={aadhaarFileInputRef}
+                style={{ display: 'none' }}
+                onChange={(e) => handleFileUpload(currentMrId, e, 'aadhaarCard')}
+                accept="image/*"
+            />
+            <input
+                type="file"
+                ref={panFileInputRef}
+                style={{ display: 'none' }}
+                onChange={(e) => handleFileUpload(currentMrId, e, 'panCard')}
+                accept="image/*"
+            />
 
             {/* Aadhaar/PAN Modal */}
             <Transition appear show={isOpen} as={React.Fragment}>
