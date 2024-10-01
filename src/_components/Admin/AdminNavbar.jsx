@@ -105,6 +105,7 @@ const AdminNavbar = () => {
         Date: moment(clinic?.createdAt).format('D MMM YYYY'),
         Hospital_Name: clinic?.hospitalName,
         Doctor_Name: clinic?.doctorName,
+        Speciality: clinic?.speciality,
         Doctor_Number: clinic?.doctorNumber,
         Doctor_Whatsapp_Contacted: clinic?.doctorWhatsAppContacted,
         Pharmacy_Name: clinic?.pharmacyName,
