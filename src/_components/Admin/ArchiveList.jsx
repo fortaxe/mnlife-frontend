@@ -78,7 +78,9 @@ const ArchiveList = () => {
                         <tr>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Hospital Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Number</th>
@@ -103,6 +105,9 @@ const ArchiveList = () => {
                                         Unarchive
                                     </button>
                                 </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.hospitalName}
+                                </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                                     {clinic?.doctorName}
                                     <button
@@ -113,11 +118,14 @@ const ArchiveList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.doctorNumber}
+                                    {clinic?.speciality}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.doctorNumber}
 
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyName}
+                                    {clinic?.pharmacyName}
                                     <button
                                         className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'pharmacy')}
@@ -126,7 +134,7 @@ const ArchiveList = () => {
                                     </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic.pharmacyNumber}
+                                    {clinic?.pharmacyNumber}
 
                                 </td>
                                 <td
