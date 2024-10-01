@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as XLSX from 'xlsx';
 import moment from "moment";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Hospital, Menu, X } from "lucide-react";
 import { setDateRange, setSelectedGrade, setSelectedMR, setFilteredClinics, clearDateRange } from "@/redux/doctorList";
 import {
   DropdownMenu,
@@ -65,16 +65,17 @@ const AdminNavbar = () => {
 
     const filtered = clinics.filter(clinic => {
       return (
-        (clinic.doctorName?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.pharmacyName?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.doctorNumber?.toString() || '').includes(value) ||
-        (clinic.pharmacyNumber?.toString() || '').includes(value) ||
-        (clinic.grade?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.createdBy?.name?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.speciality?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.remarks?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.notes?.toLowerCase() || '').includes(lowercaseValue) ||
-        (clinic.createdAt && moment(clinic.createdAt).isValid() ?
+        (clinic?.hospitalName?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.doctorName?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.pharmacyName?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.doctorNumber?.toString() || '').includes(value) ||
+        (clinic?.pharmacyNumber?.toString() || '').includes(value) ||
+        (clinic?.grade?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.createdBy?.name?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.speciality?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.remarks?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.notes?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.createdAt && moment(clinic.createdAt).isValid() ?
           moment(clinic.createdAt).format('D MMM YYYY').toLowerCase() : ''
         ).includes(lowercaseValue)
       );
@@ -102,6 +103,7 @@ const AdminNavbar = () => {
 
       return {
         Date: moment(clinic?.createdAt).format('D MMM YYYY'),
+        Hospital_Name: clinic?.hospitalName,
         Doctor_Name: clinic?.doctorName,
         Doctor_Number: clinic?.doctorNumber,
         Doctor_Whatsapp_Contacted: clinic?.doctorWhatsAppContacted,
