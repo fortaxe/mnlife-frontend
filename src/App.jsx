@@ -17,6 +17,7 @@ import ProtectedRoute from "./_components/Admin/ProtectedRoute";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setLoginState } from "./redux/authSlice";
+import UnarchiveMrList from "./_components/Admin/ArchivedMr";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,6 +45,7 @@ function App() {
             <Route path="mr-list" element={<MrList />} />
             <Route path="appointments" element={<Appointments />} />
             <Route path="called-list" element={<CalledList />} />
+            <Route path="archived-mr" element={<UnarchiveMrList />} />
             <Route path="archive" element={<ArchiveList />} />
           </Route>
 

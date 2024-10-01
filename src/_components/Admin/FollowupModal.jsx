@@ -30,14 +30,14 @@ const FollowUpModal = ({ isOpen, onClose, followUps }) => {
                                         <tr key={followUp._id} className="border-b">
                                             
                                             <td className="border px-4 py-2 text-sm text-gray-600">
-                                                {moment(followUp.followUpDate).format('D MMM YYYY')}
+                                                {moment(followUp?.followUpDate).format('D MMM YYYY')}
                                             </td>
                                              <td className="border px-4 py-2 text-sm text-gray-600">
-                                                {moment(followUp.followUpDate).format('hh:mm A')}
+                                                {moment(followUp?.followUpDate).format('hh:mm A')}
                                             </td>
                                             <td className="border px-4 py-2 text-sm text-gray-600">
                                                 <a
-                                                    href={followUp.url}
+                                                    href={followUp?.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-blue-500 underline"
@@ -48,7 +48,7 @@ const FollowUpModal = ({ isOpen, onClose, followUps }) => {
                                             <td className="border px-4 py-2">
                                                 <Input
                                                     type="text"
-                                                    value={followUp.remarks}
+                                                    value={followUp?.remarks}
                                                     className="text-sm w-full"
                                                     readOnly
                                                 />

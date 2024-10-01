@@ -114,6 +114,7 @@ const DoctorList = () => {
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Hospital Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
@@ -141,6 +142,9 @@ const DoctorList = () => {
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
                                         Archive
                                     </button>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.hospitalName}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                                     {clinic?.doctorName}

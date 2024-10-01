@@ -16,15 +16,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
         id: clinic._id,
-        doctorName: clinic.doctorName,
-        doctorNumber: clinic.doctorNumber,
-        pharmacyName: clinic.pharmacyName,
-        pharmacyNumber: clinic.pharmacyNumber,
-        grade: clinic.grade,
-        remarks: clinic.remarks,
-        notes: clinic.notes,
-        doctorWhatsAppContacted: clinic.doctorWhatsAppContacted,
-        pharmacyWhatsAppContacted: clinic.pharmacyWhatsAppContacted,
+        hospitalName: clinic?.hospitalName,
+        doctorName: clinic?.doctorName,
+        speciality: clinic?.speciality,
+        doctorNumber: clinic?.doctorNumber,
+        pharmacyName: clinic?.pharmacyName,
+        pharmacyNumber: clinic?.pharmacyNumber,
+        grade: clinic?.grade,
+        remarks: clinic?.remarks,
+        notes: clinic?.notes,
+        doctorWhatsAppContacted: clinic?.doctorWhatsAppContacted,
+        pharmacyWhatsAppContacted: clinic?.pharmacyWhatsAppContacted,
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -54,13 +56,27 @@ const EditClinicModal = ({ clinic, onClose, onUpdate }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center mt-[60px]">
             <div className="bg-white p-6 rounded-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Edit Clinic</h2>
+                <h2 className="text-xl font-bold mb-4">Edit Doctor</h2>
                 <form onSubmit={handleSubmit}>
+                <Input
+                        name="hospitalName"
+                        value={formData.hospitalName}
+                        onChange={handleChange}
+                        placeholder="Hospital Name"
+                        className="mb-2"
+                    />
                     <Input
                         name="doctorName"
                         value={formData.doctorName}
+                        onChange={handleChange}
+                        placeholder="Doctor Name"
+                        className="mb-2"
+                    />
+                    <Input
+                        name="speciality"
+                        value={formData.speciality}
                         onChange={handleChange}
                         placeholder="Doctor Name"
                         className="mb-2"

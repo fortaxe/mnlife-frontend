@@ -106,7 +106,19 @@ const Sidebar = () => {
             </li>
           </ul>
 
-          <div className="mt-[182px]">
+          <div className="mt-[130px]">
+            <Link
+              to="/admin/dashboard/archived-mr"
+              className={`flex items-center text-white p-2 ${isActiveRoute("/admin/dashboard/archived-mr")
+                  ? "bg-[#386D62]"
+                  : "bg-[#CCA66B] hover:bg-[#386D62]"
+                }`}
+            >
+              <span className="ms-3">Archived MR</span>
+            </Link>
+          </div>
+
+          <div className="mt-[10px]">
             <Link
               to="/admin/dashboard/archive"
               className={`flex items-center text-white p-2 ${isActiveRoute("/admin/dashboard/archive")
