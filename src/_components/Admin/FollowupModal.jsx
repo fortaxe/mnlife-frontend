@@ -99,7 +99,7 @@ const FollowUpModal = ({ isOpen, onClose, followUps }) => {
                 <Dialog open={Boolean(selectedImage)} onClose={closeImageModal} className="relative z-50">
                     <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
                     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                        <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-4xl h-[600px] flex flex-col items-center justify-between"> {/* Flex column layout */}
+                        <div className="bg-white p-4 rounded-lg shadow-lg w-auto h-[600px] object-fit flex flex-col items-center justify-between"> {/* Flex column layout */}
                             <img
                                 src={selectedImage}
                                 alt="Follow-up"
