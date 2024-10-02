@@ -78,12 +78,12 @@ const ArchiveList = () => {
                         <tr>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Hospital Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Number</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Contact</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Location</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Grade</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>

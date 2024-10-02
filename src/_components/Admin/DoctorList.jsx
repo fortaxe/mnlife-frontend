@@ -124,13 +124,13 @@ const DoctorList = () => {
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Hospital Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Image</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Visit Image</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacist Contact Number</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Contact</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Location</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Grade</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
@@ -258,7 +258,7 @@ const DoctorList = () => {
 
                 {isImageModalOpen && selectedClinic?.doctorImage && (
                     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                        <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-4xl h-[600px] flex flex-col items-center justify-between"> {/* Flex column layout */}
+                        <div className="bg-white p-4 rounded-lg shadow-lg w-auto h-[600px] flex flex-col items-center justify-between"> {/* Flex column layout */}
                             <img
                                 src={selectedClinic?.doctorImage}
                                 alt="Doctor"
