@@ -19,7 +19,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Button } from "@/components/ui/button";
 import LoadingAnimation from "./LoadingAnimation";
 
-
 const MrList = () => {
     const [uploadingStatus, setUploadingStatus] = useState({});
     const dispatch = useDispatch();
@@ -255,7 +254,7 @@ const MrList = () => {
                         <tr>
                             <th className="p-2 font-medium text-gray-900">Delete</th>
                             <th className="p-2 font-medium text-gray-900">Archive</th>
-                            <th className="p-2 font-medium text-gray-900">MR Create Date</th>
+                            <th className="p-2 font-medium text-gray-900">Joining Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Number</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Area</th>

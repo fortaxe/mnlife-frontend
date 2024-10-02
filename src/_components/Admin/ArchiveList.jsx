@@ -100,22 +100,21 @@ const ArchiveList = () => {
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
+                                    <div className="py-1">
+                                        {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
+                                    </div>
+                                    <div className="py-1">
+                                        {clinic?.createdAt ? moment(clinic?.createdAt).format('hh:mm A') : ''}
+                                    </div>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.hospitalName}
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleUnarchiveClinic(clinic?._id)}>
                                         Unarchive
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.hospitalName}
-                                </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                                     {clinic?.doctorName}
-                                    <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
-                                        onClick={() => openScheduleModal(clinic, 'doctor')}
-                                    >
-                                        Schedule Call
-                                    </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.speciality}
@@ -126,12 +125,6 @@ const ArchiveList = () => {
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.pharmacyName}
-                                    <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
-                                        onClick={() => openScheduleModal(clinic, 'pharmacy')}
-                                    >
-                                        Schedule Call
-                                    </button>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.pharmacyNumber}

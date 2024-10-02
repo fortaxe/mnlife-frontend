@@ -126,7 +126,7 @@ const Sidebar = () => {
                   : "bg-[#CCA66B] hover:bg-[#386D62]"
                 }`}
             >
-              <span className="ms-3">Archive</span>
+              <span className="ms-3">Archived Doctor</span>
             </Link>
           </div>
         </div>

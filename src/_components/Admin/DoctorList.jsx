@@ -29,7 +29,7 @@ const DoctorList = () => {
     const [loadingClinicId, setLoadingClinicId] = useState(null);
     const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
     const [selectedFollowUps, setSelectedFollowUps] = useState([]);
-
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
@@ -103,6 +103,16 @@ const DoctorList = () => {
         setSelectedFollowUps([]);
     };
 
+    const openImageModal = (clinic) => {
+        setSelectedClinic(clinic);
+        setIsImageModalOpen(true); // Open modal when clicked
+    };
+
+    const closeImageModal = () => {
+        setIsImageModalOpen(false); // Close modal
+        setSelectedClinic(null); // Reset the selected clinic
+    };
+
     return (
         <div>
             <AdminNavbar />
@@ -115,6 +125,7 @@ const DoctorList = () => {
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Hospital Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Image</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
@@ -138,13 +149,31 @@ const DoctorList = () => {
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
+                                    <div className="py-1">
+                                        {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
+                                    </div>
+                                    <div className="py-1">
+                                        {clinic?.createdAt ? moment(clinic?.createdAt).format('hh:mm A') : ''}
+                                    </div>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.hospitalName}
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
                                         Archive
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.hospitalName}
+                                <td className="whitespace-nowrap px-4 py-2">
+                                    {clinic?.doctorImage ? (
+                                        <span
+                                            className="text-blue-500 cursor-pointer"
+                                            onClick={() => openImageModal(clinic)}
+                                        >
+                                            View Image
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-500">No Image</span>
+                                    )}
+
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-900">
                                     {clinic?.doctorName}
@@ -164,7 +193,6 @@ const DoctorList = () => {
                                         View Follow-up
                                     </button>
                                 </td>
-
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.doctorNumber}
                                     <div className="flex items-center mt-2">
@@ -213,17 +241,6 @@ const DoctorList = () => {
                                 </td>
 
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {/* <DropdownMenu>
-                                        <DropdownMenuTrigger className="flex items-center">
-                                            {clinic.grade}
-                                            <ChevronDown className="ml-2" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem>A</DropdownMenuItem>
-                                            <DropdownMenuItem>B</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu> */}
-
                                     {clinic?.grade}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
@@ -238,6 +255,24 @@ const DoctorList = () => {
                         ))}
                     </tbody>
                 </table>
+
+                {isImageModalOpen && selectedClinic?.doctorImage && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                        <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-4xl h-[600px] flex flex-col items-center justify-between"> {/* Flex column layout */}
+                            <img
+                                src={selectedClinic?.doctorImage}
+                                alt="Doctor"
+                                className="max-h-[500px] w-full" // Adjust to max-height and maintain aspect ratio
+                            />
+                            <button
+                                className="mt-4 bg-red-500 text-white px-4 py-2 rounded self-center" // Center the button
+                                onClick={closeImageModal}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {isModalOpen && (
                     <ScheduleModal
