@@ -107,10 +107,15 @@ const MrForm = () => {
 
     const handleFileSelect = (event, setFile, setError) => {
         const file = event.target.files[0];
+        const maxSize = 2 * 1024 * 1024;
+
         if (file) {
             if (!allowedFileTypes.includes(file.type)) {
                 setError("Invalid file format. Only jpeg and png are allowed.");
                 setFile(null);
+            } else if (file.size > maxSize) {
+                setError("File size exceeds 2 MB. Please upload a smaller image.");
+            setFile(null);
             } else {
                 setError(""); // Clear error if valid
                 setFile(file);

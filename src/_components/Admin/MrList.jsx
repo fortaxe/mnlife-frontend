@@ -198,6 +198,13 @@ const MrList = () => {
             return;
         }
 
+         // Check file size (2MB = 2 * 1024 * 1024 bytes)
+         const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+         if (file.size > maxSize) {
+             toast.error(`${cardType === 'aadhaarCard' ? 'Aadhaar' : 'PAN'} card exceeds 2 MB. Please upload a smaller image.`);
+             return;
+         }
+
         // Start loader for the specific MR and card type
         setUploadingStatus(prev => ({
             ...prev,
