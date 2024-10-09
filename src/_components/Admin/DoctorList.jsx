@@ -30,6 +30,8 @@ const DoctorList = () => {
     const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
     const [selectedFollowUps, setSelectedFollowUps] = useState([]);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [clinicToDelete, setClinicToDelete] = useState(null);
 
     const dispatch = useDispatch();
     const { filteredClinics, status, error } = useSelector((state) => state.doctorList);
@@ -43,6 +45,11 @@ const DoctorList = () => {
         setSelectedClinic(clinic);
         setScheduleType(type);
         setIsModalOpen(true);
+    };
+
+    const confirmDelete = (id) => {
+        setClinicToDelete(id);
+        setIsDeleteConfirmOpen(true);
     };
 
     const handleEditClick = (clinic) => {
@@ -74,8 +81,10 @@ const DoctorList = () => {
 
     const handleDeleteClinic = async (id) => {
         try {
-            await dispatch(deleteClinic({ id }));
+            await dispatch(deleteClinic({ id: clinicToDelete }));
             toast.success("Clinic deleted successfully");
+            setIsDeleteConfirmOpen(false);
+            setClinicToDelete(null);
         } catch (err) {
             toast.error(err || "Failed to delete clinic");
         }
@@ -121,6 +130,7 @@ const DoctorList = () => {
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="ltr:text-left rtl:text-right ">
                         <tr>
+                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Sr. No.</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
@@ -142,11 +152,14 @@ const DoctorList = () => {
                     <tbody className="divide-y divide-gray-200">
                         {filteredClinics?.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={clinic?._id} style={{ height: "80px" }}>
+                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {index + 1}
+                                </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleDeleteClinic(clinic?._id)} />
+                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => confirmDelete(clinic?._id)} />
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <div className="py-1">
@@ -273,6 +286,30 @@ const DoctorList = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Confirmation Modal */}
+                {isDeleteConfirmOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                        <div className="bg-white p-4 rounded-lg shadow-lg">
+                            <p>Do you really want to delete?</p>
+                            <div className="flex justify-between mt-4">
+                                <button
+                                    className="bg-red-500 text-white px-4 py-2 rounded"
+                                    onClick={handleDeleteClinic}
+                                >
+                                    Yes
+                                </button>
+                                <button
+                                    className="bg-gray-300 px-4 py-2 rounded"
+                                    onClick={() => setIsDeleteConfirmOpen(false)}
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
 
                 {isModalOpen && (
                     <ScheduleModal
