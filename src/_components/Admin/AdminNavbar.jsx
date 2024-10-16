@@ -127,7 +127,7 @@ const AdminNavbar = () => {
   }
 
   // Handle doctor contacts export
-  const handleDoctorContactsExport  = () => {
+  const handleDoctorContactsExport = () => {
     const dataToExport = filteredClinics.length > 0 ? filteredClinics : clinics;
 
     if (dataToExport.length === 0) {
@@ -172,7 +172,7 @@ const AdminNavbar = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
     XLSX.writeFile(workbook, "PharmacistContacts.xlsx");
   }
-  
+
 
   const handleMRSelect = (mrName) => {
     dispatch(setSelectedMR(mrName));
@@ -365,7 +365,7 @@ const AdminNavbar = () => {
       <div className={`h-full flex flex-wrap items-center justify-between mx-auto ${isLargeScreen ? 'max-w-[calc(100vw-200px)]' : 'max-w-[calc(100vw-30px)]'
         }`}>
         {/* Left side: Export and Filters (visible only on larger screens) */}
-        <div className="hidden xl:flex items-center space-x-6 overflow-x-auto p-4 ml-14 h-full">
+        <div className="hidden xl:flex items-center space-x-6 overflow-x-auto p-4 ml-12 h-full">
           <button onClick={handleExport} className="text-black bg-[#FBFAD6]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
             Export
           </button>
@@ -417,7 +417,7 @@ const AdminNavbar = () => {
           <div className="relative" ref={mrDropdownRef}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="dropdown-toggle w-[180px] justify-start bg-[#FBFAD6]" onClick={toggleMRDropdown}>
+                <Button variant="outline" className="dropdown-toggle w-[125px] justify-start bg-[#FBFAD6]" onClick={toggleMRDropdown}>
                   {selectedMR || "Select MR"}
                   <ChevronDown className="ml-auto h-4 w-4" />
                 </Button>
@@ -427,7 +427,7 @@ const AdminNavbar = () => {
                   <X size={12} />
                 </button>
               )}
-              <DropdownMenuContent className="w-[180px]">
+              <DropdownMenuContent className="w-[160px]">
                 {mrList.map((mr, index) => (
                   <DropdownMenuItem key={index} onSelect={() => dispatch(setSelectedMR(mr))}>
                     {mr}
@@ -461,13 +461,13 @@ const AdminNavbar = () => {
 
           {/* Export Doctor Contacts */}
 
-          <button onClick={handleDoctorContactsExport} className="text-black bg-[#FBFAD6]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
-             Doctor Contacts
+          <button onClick={handleDoctorContactsExport} className="text-white bg-[#16a085]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
+            Export Doctor Contacts
           </button>
 
           {/* Export Pharmacy Contacts */}
-          <button onClick={handlePharmacistContactsExport} className="text-black bg-[#FBFAD6]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
-             Pharmacy Contacts
+          <button onClick={handlePharmacistContactsExport} className="text-white bg-[#16a085]   border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
+            Export Pharmacy Contacts
           </button>
 
         </div>
