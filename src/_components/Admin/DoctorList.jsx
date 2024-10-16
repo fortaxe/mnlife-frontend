@@ -125,27 +125,27 @@ const DoctorList = () => {
     return (
         <div>
             <AdminNavbar />
-
             <div className="overflow-x-auto mt-[80px] w-full p-0 m-0">
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="ltr:text-left rtl:text-right ">
                         <tr>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Sr. No.</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Visit Image</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Contact</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Location</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Grade</th>
+                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Sr. No.</th>      
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Grade</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Name</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Contact</th>         
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>   
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Remarks</th>
                             <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Notes</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Location</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Visit Image</th>
+                            
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
                         </tr>
                     </thead>
 
@@ -156,11 +156,8 @@ const DoctorList = () => {
                                     {index + 1}
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => confirmDelete(clinic?._id)} />
-                                </td>
+                                    {clinic?.createdBy?.name}
+                                </td>                                
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     <div className="py-1">
                                         {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
@@ -170,58 +167,14 @@ const DoctorList = () => {
                                     </div>
                                 </td>
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.grade}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.hospitalName}
                                     <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
                                         Archive
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2">
-                                    {clinic?.doctorImage ? (
-                                        <span
-                                            className="text-blue-500 cursor-pointer"
-                                            onClick={() => openImageModal(clinic)}
-                                        >
-                                            View Image
-                                        </span>
-                                    ) : (
-                                        <span className="text-gray-500">No Image</span>
-                                    )}
-
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-900">
-                                    {clinic?.doctorName}
-                                    <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
-                                        onClick={() => openScheduleModal(clinic, 'doctor')}
-                                    >
-                                        Schedule Call
-                                    </button>
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.speciality}
-                                    <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FBFAD6]"
-                                        onClick={() => openFollowUpModal(clinic?.followUps)}
-                                    >
-                                        View Follow-up
-                                    </button>
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.doctorNumber}
-                                    <div className="flex items-center mt-2">
-                                        <input
-                                            type="checkbox"
-                                            id={`doctor-contacted-${clinic?._id}`}
-                                            checked={clinic?.doctorWhatsAppContacted}
-                                            readOnly
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={`doctor-contacted-${clinic?._id}`} className="text-sm">
-                                            What's App Contacted
-                                        </label>
-                                    </div>
-                                </td>
-
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.pharmacyName}
                                     <button
@@ -246,23 +199,68 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
+                               
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+                                    {clinic?.doctorName}
+                                    <button
+                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
+                                        onClick={() => openScheduleModal(clinic, 'doctor')}
+                                    >
+                                        Schedule Call
+                                    </button>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.doctorNumber}
+                                    <div className="flex items-center mt-2">
+                                        <input
+                                            type="checkbox"
+                                            id={`doctor-contacted-${clinic?._id}`}
+                                            checked={clinic?.doctorWhatsAppContacted}
+                                            readOnly
+                                            className="mr-2"
+                                        />
+                                        <label htmlFor={`doctor-contacted-${clinic?._id}`} className="text-sm">
+                                            What's App Contacted
+                                        </label>
+                                    </div>
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    {clinic?.speciality}
+                                    <button
+                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FBFAD6]"
+                                        onClick={() => openFollowUpModal(clinic?.followUps)}
+                                    >
+                                        View Follow-up
+                                    </button>
+                                </td>
+                               
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic?.remarks}</td>
+                                <td className="whitespace-nowrap px-4 py-2">
+                                    <Input className="w-[300px] h-[50px]" value={clinic?.notes} readOnly />
+                                </td>
                                 <td
                                     className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
                                     onClick={() => clinic?.url && window.open(clinic?.url, "_blank")}
                                 >
                                     {clinic?.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
-
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.grade}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                                    {clinic?.createdBy?.name}
-                                </td>
-
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic?.remarks}</td>
                                 <td className="whitespace-nowrap px-4 py-2">
-                                    <Input className="w-[300px] h-[50px]" value={clinic?.notes} readOnly />
+                                    {clinic?.doctorImage ? (
+                                        <span
+                                            className="text-blue-500 cursor-pointer"
+                                            onClick={() => openImageModal(clinic)}
+                                        >
+                                            View Image
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-500">No Image</span>
+                                    )}
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
+                                </td>
+                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                    <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => confirmDelete(clinic?._id)} />
                                 </td>
                             </tr>
                         ))}
