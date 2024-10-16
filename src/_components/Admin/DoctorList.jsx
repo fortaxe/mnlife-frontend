@@ -129,36 +129,36 @@ const DoctorList = () => {
                 <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead className="ltr:text-left rtl:text-right ">
                         <tr>
-                        <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Sr. No.</th>      
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">MR Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Date</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Grade</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Name</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Pharmacy Person Contact</th>         
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Name</th>   
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Doctor Number</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Speciality</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Remarks</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Notes</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Location</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Visit Image</th>
-                            
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Edit</th>
-                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Delete</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Sr. No.</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">MR Name</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Date</th>
+                            <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 text-left">Grade</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Pharmacy Name</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Pharmacy Person Name</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Pharmacy Person Contact</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Doctor Name</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Doctor Number</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Speciality</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Remarks</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Notes</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Location</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Visit Image</th>
+
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Edit</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Delete</th>
                         </tr>
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
                         {filteredClinics?.map((clinic, index) => (
                             <tr className="odd:bg-gray-50" key={clinic?._id} style={{ height: "80px" }}>
-                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {index + 1}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.createdBy?.name}
-                                </td>                                
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     <div className="py-1">
                                         {clinic?.createdAt ? moment(clinic?.createdAt).format('D MMM YYYY') : ''}
                                     </div>
@@ -169,22 +169,22 @@ const DoctorList = () => {
                                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                                     {clinic?.grade}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.hospitalName}
-                                    <button className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
+                                    <button className="block p-1 px-3 rounded-md mt-2 text-sm bg-[#FFD9BD]" onClick={() => handleArchiveClinic(clinic?._id)}>
                                         Archive
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.pharmacyName}
                                     <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
+                                        className="block p-1 px-3 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'pharmacy')}
                                     >
                                         Schedule Call
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.pharmacyNumber}
                                     <div className="flex items-center mt-2">
                                         <input
@@ -199,17 +199,17 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
-                               
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-900">
+
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-900">
                                     {clinic?.doctorName}
                                     <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#E2FFBD]"
+                                        className="block p-1 px-3 rounded-md mt-2 text-sm bg-[#E2FFBD]"
                                         onClick={() => openScheduleModal(clinic, 'doctor')}
                                     >
                                         Schedule Call
                                     </button>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.doctorNumber}
                                     <div className="flex items-center mt-2">
                                         <input
@@ -224,27 +224,29 @@ const DoctorList = () => {
                                         </label>
                                     </div>
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     {clinic?.speciality}
                                     <button
-                                        className="block p-1 px-4 rounded-md mt-2 text-sm bg-[#FBFAD6]"
+                                        className="block p-1 px-3 rounded-md mt-2 text-sm bg-[#FBFAD6]"
                                         onClick={() => openFollowUpModal(clinic?.followUps)}
                                     >
                                         View Follow-up
                                     </button>
                                 </td>
-                               
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">{clinic?.remarks}</td>
-                                <td className="whitespace-nowrap px-4 py-2">
-                                    <Input className="w-[300px] h-[50px]" value={clinic?.notes} readOnly />
+
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
+                                    <Input className="w-[300px] h-[50px]" value={clinic?.remarks}  />
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-2">
+                                    <Input className="w-[300px] h-[50px]" value={clinic?.notes}  />
                                 </td>
                                 <td
-                                    className="whitespace-nowrap px-4 py-2 text-blue-500 cursor-pointer"
+                                    className="whitespace-nowrap px-3 py-2 text-blue-500 cursor-pointer"
                                     onClick={() => clinic?.url && window.open(clinic?.url, "_blank")}
                                 >
                                     {clinic?.url && clinic.url.length > 0 ? "Location" : "No Location"}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2">
+                                <td className="whitespace-nowrap px-3 py-2">
                                     {clinic?.doctorImage ? (
                                         <span
                                             className="text-blue-500 cursor-pointer"
@@ -256,10 +258,10 @@ const DoctorList = () => {
                                         <span className="text-gray-500">No Image</span>
                                     )}
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     <Edit className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => handleEditClick(clinic)} />
                                 </td>
-                                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     <Trash2 className="w-5 h-5 text-gray-700 cursor-pointer" onClick={() => confirmDelete(clinic?._id)} />
                                 </td>
                             </tr>

@@ -85,9 +85,9 @@ const AdminNavbar = () => {
     dispatch(setFilteredClinics(filtered));
   };
 
+
+  // Handle export
   const handleExport = () => {
-
-
     const dataToExport = filteredClinics.length > 0 ? filteredClinics : clinics;
 
     if (dataToExport.length === 0) {
@@ -125,6 +125,54 @@ const AdminNavbar = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
     XLSX.writeFile(workbook, "DoctorList.xlsx");
   }
+
+  // Handle doctor contacts export
+  const handleDoctorContactsExport  = () => {
+    const dataToExport = filteredClinics.length > 0 ? filteredClinics : clinics;
+
+    if (dataToExport.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const exportData = dataToExport.map((clinic) => {
+
+      return {
+        Name: `${clinic?.createdBy?.name || ''}, ${clinic?.hospitalName || ''}, ${clinic?.doctorName || ''}`,
+        Number: clinic?.doctorNumber,
+      };
+    });
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "DoctorContacts.xlsx");
+  }
+
+  // Handle pharmacist contacts export
+  const handlePharmacistContactsExport = () => {
+    const dataToExport = filteredClinics.length > 0 ? filteredClinics : clinics;
+
+    if (dataToExport.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const exportData = dataToExport.map((clinic) => {
+
+      return {
+        Name: `${clinic?.createdBy?.name || ''}, ${clinic?.hospitalName || ''}, ${clinic?.pharmacyName || ''}`,
+        Number: clinic?.pharmacyNumber,
+      };
+    });
+
+    // Export the data
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clinics");
+    XLSX.writeFile(workbook, "PharmacistContacts.xlsx");
+  }
+  
 
   const handleMRSelect = (mrName) => {
     dispatch(setSelectedMR(mrName));
@@ -294,7 +342,7 @@ const AdminNavbar = () => {
 
     dispatch(setDateRange({ startDate: newStartDate, endDate: newEndDate }));
     setIsDatePickerOpen(false);
-    setIsOpen(false);  
+    setIsOpen(false);
   };
 
   const clearDateFilter = () => {
@@ -330,10 +378,10 @@ const AdminNavbar = () => {
                   : 'Date Range'}
                 {isDateRangeSelected && (
                   <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearDateFilter();
-                  }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearDateFilter();
+                    }}
                     className="absolute -right-2 -top-2 bg-red-500 text-white rounded-full p-1"
                   >
                     <X size={12} />
@@ -411,6 +459,17 @@ const AdminNavbar = () => {
             </DropdownMenu>
           </div>
 
+          {/* Export Doctor Contacts */}
+
+          <button onClick={handleDoctorContactsExport} className="text-black bg-[#FBFAD6]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
+             Doctor Contacts
+          </button>
+
+          {/* Export Pharmacy Contacts */}
+          <button onClick={handlePharmacistContactsExport} className="text-black bg-[#FBFAD6]  border border-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 whitespace-nowrap ">
+             Pharmacy Contacts
+          </button>
+
         </div>
 
         {/* Right side: Search, Profile, and Mobile Menu */}
@@ -459,92 +518,92 @@ const AdminNavbar = () => {
         </div>
       </div>
 
-       {/* Mobile menu */}
-  <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} xl:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md z-20`}>
-    <ul className="flex flex-col font-medium p-4 space-y-2">
-      <li>
-        <button onClick={handleExport} className="w-full text-left py-2 px-4 text-white bg-blue-700 rounded">
-          Export
-        </button>
-      </li>
-      <li>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-start">
-              {isDateRangeSelected
-                ? `${moment(dateRange.startDate).format('DD/MM/YYYY')} - ${moment(dateRange.endDate).format('DD/MM/YYYY')}`
-                : 'Date Range'}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm font-medium text-gray-700">Start Date:</label>
-              <input
-                type="date"
-                value={tempStartDate}
-                onChange={(e) => handleDateChange(e.target.value, true)}
-                className="border rounded px-2 py-1"
-              />
-              <label className="text-sm font-medium text-gray-700">End Date:</label>
-              <input
-                type="date"
-                value={tempEndDate}
-                onChange={(e) => handleDateChange(e.target.value, false)}
-                className="border rounded px-2 py-1"
-              />
-              <Button onClick={applyDateFilter} className="mt-2">
-                Apply
-              </Button>
-              {isDateRangeSelected && (
-                <Button onClick={clearDateFilter} variant="outline" className="mt-2">
-                  Clear
+      {/* Mobile menu */}
+      <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} xl:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-900 shadow-md z-20`}>
+        <ul className="flex flex-col font-medium p-4 space-y-2">
+          <li>
+            <button onClick={handleExport} className="w-full text-left py-2 px-4 text-white bg-blue-700 rounded">
+              Export
+            </button>
+          </li>
+          <li>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start">
+                  {isDateRangeSelected
+                    ? `${moment(dateRange.startDate).format('DD/MM/YYYY')} - ${moment(dateRange.endDate).format('DD/MM/YYYY')}`
+                    : 'Date Range'}
                 </Button>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </li>
-      <li>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full justify-start">
-              {selectedMR || "Select MR"}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-full">
-            {mrList.map((mr, index) => (
-              <DropdownMenuItem key={index} onSelect={() => handleMRSelect(mr)}>
-                {mr}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {selectedMR && (
-          <Button onClick={clearMRFilter} variant="outline" className="mt-2 w-full">
-            Clear MR Filter
-          </Button>
-        )}
-      </li>
-      <li>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full justify-start">
-              {selectedGrade || "Grade"}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-full">
-            <DropdownMenuItem onSelect={() => handleGradeSelect('A')}>A</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => handleGradeSelect('B')}>B</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {selectedGrade && (
-          <Button onClick={clearGradeFilter} variant="outline" className="mt-2 w-full">
-            Clear Grade Filter
-          </Button>
-        )}
-      </li>
-    </ul>
-  </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Start Date:</label>
+                  <input
+                    type="date"
+                    value={tempStartDate}
+                    onChange={(e) => handleDateChange(e.target.value, true)}
+                    className="border rounded px-2 py-1"
+                  />
+                  <label className="text-sm font-medium text-gray-700">End Date:</label>
+                  <input
+                    type="date"
+                    value={tempEndDate}
+                    onChange={(e) => handleDateChange(e.target.value, false)}
+                    className="border rounded px-2 py-1"
+                  />
+                  <Button onClick={applyDateFilter} className="mt-2">
+                    Apply
+                  </Button>
+                  {isDateRangeSelected && (
+                    <Button onClick={clearDateFilter} variant="outline" className="mt-2">
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </li>
+          <li>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-start">
+                  {selectedMR || "Select MR"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full">
+                {mrList.map((mr, index) => (
+                  <DropdownMenuItem key={index} onSelect={() => handleMRSelect(mr)}>
+                    {mr}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {selectedMR && (
+              <Button onClick={clearMRFilter} variant="outline" className="mt-2 w-full">
+                Clear MR Filter
+              </Button>
+            )}
+          </li>
+          <li>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-start">
+                  {selectedGrade || "Grade"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full">
+                <DropdownMenuItem onSelect={() => handleGradeSelect('A')}>A</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleGradeSelect('B')}>B</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {selectedGrade && (
+              <Button onClick={clearGradeFilter} variant="outline" className="mt-2 w-full">
+                Clear Grade Filter
+              </Button>
+            )}
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 };
