@@ -139,8 +139,10 @@ const DoctorList = () => {
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Doctor Name</th>
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Doctor Number</th>
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Speciality</th>
+                            <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Address</th>
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Remarks</th>
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Notes</th>
+                           
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Location</th>
                             <th className="whitespace-nowrap px-3 py-2 font-medium text-gray-900 text-left">Visit Image</th>
 
@@ -233,7 +235,9 @@ const DoctorList = () => {
                                         View Follow-up
                                     </button>
                                 </td>
-
+                                <td className="whitespace-nowrap px-3 py-2 text-gray-700">
+                                    {clinic?.areaName}
+                                </td>
                                 <td className="whitespace-nowrap px-3 py-2 text-gray-700">
                                     <Input className="w-[300px] h-[50px]" value={clinic?.remarks}  />
                                 </td>

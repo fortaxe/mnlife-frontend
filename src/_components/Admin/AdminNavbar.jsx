@@ -73,6 +73,7 @@ const AdminNavbar = () => {
         (clinic?.grade?.toLowerCase() || '').includes(lowercaseValue) ||
         (clinic?.createdBy?.name?.toLowerCase() || '').includes(lowercaseValue) ||
         (clinic?.speciality?.toLowerCase() || '').includes(lowercaseValue) ||
+        (clinic?.areaName?.toLowerCase() || '').includes(lowercaseValue) ||
         (clinic?.remarks?.toLowerCase() || '').includes(lowercaseValue) ||
         (clinic?.notes?.toLowerCase() || '').includes(lowercaseValue) ||
         (clinic?.createdAt && moment(clinic.createdAt).isValid() ?
@@ -113,6 +114,7 @@ const AdminNavbar = () => {
         Pharmacy_Whatsapp_Contacted: clinic?.pharmacyWhatsAppContacted,
         Grade: clinic?.grade,
         MR_Name: clinic?.createdBy?.name,
+        Address: clinic?.areaName,
         Remarks: clinic?.remarks,
         Notes: clinic?.notes,
         "Follow Up Details": followUpDetails || 'No follow-ups',  // Add formatted follow-up details
